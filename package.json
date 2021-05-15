@@ -1,5 +1,5 @@
 {
-  "name": "@sushiswap/subgraphs",
+  "name": "@indexed-finance/subgraphs",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -8,15 +8,8 @@
   "scripts": {
     "build": "yarn workspaces run build",
     "codegen": "yarn workspaces run codegen",
-    "prepare:bsc": "yarn workspaces run prepare:bsc",
-    "prepare:fantom": "yarn workspaces run prepare:fantom",
-    "prepare:goerli": "yarn workspaces run prepare:goerli",
-    "prepare:kovan": "yarn workspaces run prepare:kovan",
     "prepare:mainnet": "yarn workspaces run prepare:mainnet",
-    "prepare:matic": "yarn workspaces run prepare:matic",
-    "prepare:rinkeby": "yarn workspaces run prepare:rinkeby",
-    "prepare:ropsten": "yarn workspaces run prepare:ropsten",
-    "prepare:xdai": "yarn workspaces run prepare:xdai"
+    "prepare:rinkeby": "yarn workspaces run prepare:rinkeby"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.20.0",

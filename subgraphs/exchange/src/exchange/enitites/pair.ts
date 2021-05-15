@@ -1,5 +1,5 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts'
-import { BIG_DECIMAL_ZERO, BIG_INT_ZERO, FACTORY_ADDRESS } from 'const'
+import { BIG_DECIMAL_ZERO, BIG_INT_ZERO, UNISWAP_FACTORY_ADDRESS } from 'const'
 
 import { Pair } from '../../../generated/schema'
 import { Pair as PairContract } from '../../../generated/templates/Pair/Pair'
@@ -25,7 +25,7 @@ export function getPair(address: Address, block: ethereum.Block = null): Pair | 
     }
 
     pair = new Pair(address.toHex())
-    pair.factory = FACTORY_ADDRESS.toHex()
+    pair.factory = UNISWAP_FACTORY_ADDRESS.toHex()
 
     pair.name = token0.symbol.concat('-').concat(token1.symbol)
 

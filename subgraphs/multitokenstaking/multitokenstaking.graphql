@@ -1,0 +1,245 @@
+# MultiTokenStaking
+type MultiTokenStaking @entity {
+  # Contract address
+  id: ID!
+
+  # Controller accounts
+
+  owner: Bytes!
+
+  pointsAllocator: Bytes!
+
+  rewardsSchedule: Bytes!
+
+  # Configuration
+
+  startBlock: BigInt!
+
+  endBlock: BigInt!
+
+  totalRewardsReceived: BigInt!
+
+  rewardsToken: Bytes!
+
+  # Total allocation point
+  totalAllocPoint: BigInt!
+
+  # Pools
+  pools: [Pool!]! @derivedFrom(field: "owner")
+
+  # Pool count
+  poolCount: BigInt!
+
+  # History
+  history: [History!]! @derivedFrom(field: "owner")
+
+  # Upated at
+  updatedAt: BigInt!
+
+  # Staked Balance
+  stakedBalance: BigDecimal!
+
+  # Staked Age
+  stakedAge: BigDecimal!
+
+  # Staked Removed
+  stakedAgeRemoved: BigDecimal!
+
+  # Staked Deposited
+  stakedDeposited: BigDecimal!
+
+  # Staked Withdrawn
+  stakedWithdrawn: BigDecimal!
+}
+
+type History @entity {
+  # Master chef id concatenated with timestamp
+  id: ID!
+
+  # Owner (MultiTokenStaking, Pool, or User).
+  owner: MultiTokenStaking!
+
+  # Staked Balance
+  stakedBalance: BigDecimal!
+
+  # Staked Age
+  stakedAge: BigDecimal!
+
+  # Staked Removed
+  stakedAgeRemoved: BigDecimal!
+
+  # Staked Deposited
+  stakedDeposited: BigDecimal!
+
+  # Staked Withdrawn
+  stakedWithdrawn: BigDecimal!
+
+  # Timestamp
+  timestamp: BigInt!
+
+  # Block
+  block: BigInt!
+}
+
+# Pool
+type Pool @entity {
+  # Index of pool in poolInfo on MultiTokenStaking contract
+  id: ID!
+
+  # Token info
+  symbol: String!
+  name: String!
+  decimals: BigInt!
+  isPairToken: Boolean!
+
+  # Owner
+  owner: MultiTokenStaking!
+
+  # Staking Token Address
+  token: Bytes!
+
+  # Secondary Rewarder
+  rewarder: Bytes!
+
+  # Allocation point
+  allocPoint: BigInt!
+
+  # Last reward block
+  lastRewardBlock: BigInt!
+
+  # Accumulated rewards per share
+  accRewardsPerShare: BigInt!
+
+  # Staking token balance
+  balance: BigInt!
+
+  # Pool users
+  users: [User!]! @derivedFrom(field: "pool")
+
+  # User count
+  userCount: BigInt!
+
+  # Staked Balance
+  stakedBalance: BigDecimal!
+
+  # Staked Age
+  stakedAge: BigDecimal!
+
+  # Staked Removed
+  stakedAgeRemoved: BigDecimal!
+
+  # Staked Deposited
+  stakedDeposited: BigDecimal!
+
+  # Staked Withdrawn
+  stakedWithdrawn: BigDecimal!
+
+  # Timestamp
+  timestamp: BigInt!
+
+  # Block
+  block: BigInt!
+
+  # Upated at
+  updatedAt: BigInt!
+
+  # Entry USD
+  entryUSD: BigDecimal!
+
+  # Exit USD
+  exitUSD: BigDecimal!
+
+  # Sushi harvested
+  rewardsHarvested: BigDecimal!
+
+  # Sushi harvested
+  rewardsHarvestedUSD: BigDecimal!
+}
+
+type PoolHistory @entity {
+  # Pool id concatenated with timestamp
+  id: ID!
+
+  # Pool
+  pool: Pool!
+
+  # Staked Balance
+  stakedBalance: BigDecimal!
+
+  # Staked Age
+  stakedAge: BigDecimal!
+
+  # Staked Removed
+  stakedAgeRemoved: BigDecimal!
+
+  # Staked Deposited
+  stakedDeposited: BigDecimal!
+
+  # Staked Withdrawn
+  stakedWithdrawn: BigDecimal!
+
+  # User Count
+  userCount: BigInt!
+
+  # Timestamp
+  timestamp: BigInt!
+
+  # Block
+  block: BigInt!
+
+  # Entry USD
+  entryUSD: BigDecimal!
+
+  # Exit USD
+  exitUSD: BigDecimal!
+
+  # Sushi harvested
+  rewardsHarvested: BigDecimal!
+
+  # Sushi harvested
+  rewardsHarvestedUSD: BigDecimal!
+}
+
+type User @entity {
+  # Pool id concatenated with user address
+  id: ID!
+
+  # User address
+  address: Bytes!
+
+  # Related pool
+  pool: Pool
+
+  # We do some fancy math here. Basically, any point in time, the amount of SUSHIs
+  # entitled to a user but is pending to be distributed is:
+  # pending reward = (user.amount * pool.accRewardsPerShare) - user.rewardDebt
+  # Whenever a user deposits or withdraws LP tokens to a pool. Here's what happens:
+  # 1. The pool's `accRewardsPerShare` (and `lastRewardBlock`) gets updated.
+  # 2. User receives the pending reward sent to his/her address.
+  # 3. User's `amount` gets updated.
+  # 4. User's `rewardDebt` gets updated.
+
+  # Amount
+  amount: BigInt!
+
+  # Reward debt
+  rewardDebt: BigInt!
+
+  # Entry USD
+  entryUSD: BigDecimal!
+
+  # Exit USD
+  exitUSD: BigDecimal!
+
+  # Rewards harvested
+  rewardsHarvested: BigDecimal!
+
+  # Rewards harvested USD value
+  rewardsHarvestedUSD: BigDecimal!
+
+  # Timestamp
+  timestamp: BigInt!
+
+  # Block
+  block: BigInt!
+}

@@ -1,4 +1,4 @@
-import { ADDRESS_ZERO, BIG_DECIMAL_ZERO, MASTER_CHEF_ADDRESS, MINIMUM_USD_THRESHOLD_NEW_PAIRS } from 'const'
+import { ADDRESS_ZERO, BIG_DECIMAL_ZERO, MINIMUM_USD_THRESHOLD_NEW_PAIRS } from 'const'
 import { WHITELIST, BLACKLIST_EXCHANGE_VOLUME } from '../exchange-constants'
 import { Address, BigDecimal, BigInt, log, store, dataSource } from '@graphprotocol/graph-ts'
 import { Burn, Mint, Pair, Swap, Token, Transaction } from '../../../generated/schema'
@@ -325,7 +325,7 @@ export function onSync(event: SyncEvent): void {
   // update ETH price now that reserves could have changed
   const bundle = getBundle()
   // Pass the block so we can get accurate price data before migration
-  bundle.ethPrice = getEthPrice(event.block)
+  bundle.ethPrice = getEthPrice()
   bundle.save()
 
   token0.derivedETH = findEthPerToken(token0 as Token)

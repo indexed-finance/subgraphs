@@ -1,9 +1,6 @@
-import { Address, BigDecimal, BigInt, ethereum } from '@graphprotocol/graph-ts'
-import { BIG_DECIMAL_ZERO, BIG_INT_ZERO } from 'const'
-import { LiquidityPosition, Pair } from '../../../generated/schema'
-
-import { Pair as PairContract } from '../../../generated/templates/Pair/Pair'
-import { getPair } from './pair'
+import { Address, ethereum } from '@graphprotocol/graph-ts'
+import { BIG_DECIMAL_ZERO } from 'const'
+import { LiquidityPosition } from '../../../generated/schema'
 
 // TODO: getLiquidityPosition
 // export function getLiquidityPosition(id: string): LiquidityPosition {}

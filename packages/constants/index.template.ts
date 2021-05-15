@@ -1,5 +1,7 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 
+/** ========= Numbers & Bytes ========= */
+
 export const ADDRESS_ZERO = Address.fromString('0x0000000000000000000000000000000000000000')
 
 export const BIG_DECIMAL_1E6 = BigDecimal.fromString('1e6')
@@ -22,37 +24,7 @@ export const BIG_INT_ONE_DAY_SECONDS = BigInt.fromI32(86400)
 
 export const BIG_INT_ZERO = BigInt.fromI32(0)
 
-export const LOCKUP_POOL_NUMBER = BigInt.fromI32(29)
-
-export const FACTORY_ADDRESS = Address.fromString('{{ factory_address }}')
-
-export const LOCKUP_BLOCK_NUMBER = BigInt.fromI32(10959148)
-
-export const MASTER_CHEF_ADDRESS = Address.fromString('{{ masterchef_address }}')
-
-export const SUSHI_BAR_ADDRESS = Address.fromString('{{ sushi_bar_address }}')
-
-export const SUSHI_MAKER_ADDRESS = Address.fromString('{{ sushi_maker_address }}')
-
-export const SUSHI_TOKEN_ADDRESS = Address.fromString('{{ sushi_token_address }}')
-
-export const SUSHI_USDT_PAIR_ADDRESS = Address.fromString('{{ sushi_usdt_pair_address }}')
-
-export const XSUSHI_USDC_PAIR_ADDRESS = Address.fromString('{{ xsushi_usdc_pair_address }}')
-
-export const XSUSHI_WETH_PAIR_ADDRESS = Address.fromString('{{ xsushi_weth_pair_address }}')
-
-export const SUSHI_DISTRIBUTOR_ADDRESS = Address.fromString('{{ sushi_distributor_address }}')
-
 export const NULL_CALL_RESULT_VALUE = '0x0000000000000000000000000000000000000000000000000000000000000001'
-
-export const USDC_WETH_PAIR = '{{ usdc_weth_pair }}'
-
-export const DAI_WETH_PAIR = '{{ dai_weth_pair }}'
-
-export const USDT_WETH_PAIR = '{{ usdt_weth_pair }}'
-
-export const SUSHI_USDT_PAIR = '{{ sushi_usdt_pair }}'
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
 export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('0')
@@ -60,46 +32,30 @@ export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('0')
 // minimum liquidity for price to get tracked
 export const MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('5')
 
-export const WETH_ADDRESS = Address.fromString('{{ weth_address }}')
+/** ========= Tokens ========= */
 
-export const SUSHISWAP_WETH_USDT_PAIR_ADDRESS = Address.fromString('{{ sushiswap_weth_usdt_pair_address }}')
+export const REWARDS_TOKEN_ADDRESS = Address.fromString('{{ rewards_token_address }}')
+
+export const WETH_ADDRESS = Address.fromString('{{ weth_address }}')
 
 export const USDT_ADDRESS = Address.fromString('{{ usdt_address }}')
 
-export const MASTER_CHEF_START_BLOCK = BigInt.fromI32(10750000)
+export const USDC_ADDRESS = Address.fromString('{{ usdc_address }}')
+
+export const DAI_ADDRESS = Address.fromString('{{ dai_address }}')
+
+/** ========= Factories ========= */
 
 export const UNISWAP_FACTORY_ADDRESS = Address.fromString('{{ uniswap_factory_address }}')
 
-export const UNISWAP_SUSHI_ETH_PAIR_FIRST_LIQUDITY_BLOCK = BigInt.fromI32(10750005)
+/** ========= Other ========= */
 
-export const UNISWAP_WETH_USDT_PAIR_ADDRESS = Address.fromString('{{ uniswap_weth_usdt_pair_address }}')
+export const MULTI_TOKEN_STAKING_ADDRESS = Address.fromString('{{ multi_token_staking_address }}')
 
-export const UNISWAP_SUSHI_ETH_PAIR_ADDRESS = Address.fromString('{{ uniswap_sushi_eth_pair_address }}')
+/** ========= Uniswap Pairs ========= */
 
-export const UNISWAP_SUSHI_USDT_PAIR_ADDRESS = Address.fromString('{{ uniswap_sushi_usdt_pair_address }}')
+export const USDC_WETH_PAIR = Address.fromString('{{ usdc_weth_pair }}')
 
+export const DAI_WETH_PAIR = Address.fromString('{{ dai_weth_pair }}')
 
-// Bentobox constants
-export const BENTOBOX_ADDRESS = Address.fromString('{{ bentobox_address }}')
-
-export const KASHI_PAIR_MEDIUM_RISK_MASTER_ADDRESS = Address.fromString('{{ kashi_pair_medium_risk_master_address }}')
-
-export const BENTOBOX_DEPOSIT = 'deposit'
-
-export const BENTOBOX_TRANSFER = 'transfer'
-
-export const BENTOBOX_WITHDRAW = 'withdraw'
-
-export const KASHI_PAIR_MEDIUM_RISK_TYPE = 'medium'
-
-export const PAIR_ADD_COLLATERAL = 'addCollateral'
-
-export const PAIR_REMOVE_COLLATERAL = 'removeCollateral'
-
-export const PAIR_ADD_ASSET = 'addAsset'
-
-export const PAIR_REMOVE_ASSET = 'removeAsset'
-
-export const PAIR_BORROW = 'borrow'
-
-export const PAIR_REPAY = 'repay'
+export const USDT_WETH_PAIR = Address.fromString('{{ usdt_weth_pair }}')
