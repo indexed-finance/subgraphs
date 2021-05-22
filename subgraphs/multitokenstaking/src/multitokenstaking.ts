@@ -9,6 +9,7 @@ import {
   LogPoolAddition,
   PointsAllocatorSet,
   Harvest,
+  RewardsAdded,
 } from '../generated/MultiTokenStaking/MultiTokenStaking'
 import { Address, BigDecimal, BigInt, dataSource, ethereum, log } from '@graphprotocol/graph-ts'
 import {
@@ -33,14 +34,15 @@ function getMultiTokenStaking(block: ethereum.Block): MultiTokenStaking {
   let staking = MultiTokenStaking.load(MULTI_TOKEN_STAKING_ADDRESS.toHex())
 
   if (staking === null) {
-    const contract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
+    let contract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
     staking = new MultiTokenStaking(MULTI_TOKEN_STAKING_ADDRESS.toHex())
 
     staking.owner = contract.owner()
     staking.pointsAllocator = ADDRESS_ZERO
-    staking.rewardsSchedule = contract.rewardsSchedule()
+    let rewardsSchedule = contract.rewardsSchedule()
+    staking.rewardsSchedule = rewardsSchedule
 
-    const scheduleContract = RewardsScheduleContract.bind(staking.rewardsSchedule)
+    let scheduleContract = RewardsScheduleContract.bind(rewardsSchedule)
     staking.startBlock = scheduleContract.startBlock()
     staking.endBlock = scheduleContract.endBlock()
 
@@ -73,9 +75,9 @@ export function getPool(id: BigInt, block: ethereum.Block): Pool {
   let pool = Pool.load(id.toString())
 
   if (pool === null) {
-    const staking = getMultiTokenStaking(block)
+    let staking = getMultiTokenStaking(block)
 
-    const stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
+    let stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
 
     // Create new pool.
     pool = new Pool(id.toString())
@@ -83,31 +85,32 @@ export function getPool(id: BigInt, block: ethereum.Block): Pool {
     // Set relation
     pool.owner = staking.id
 
-    const token = stakingContract.lpToken(id)
-    const rewarder = stakingContract.rewarder(id)
+    let token = stakingContract.lpToken(id)
+    pool.token = token
 
-    const poolInfo = stakingContract.poolInfo(id)
+    let rewarder = stakingContract.rewarder(id)
+    pool.rewarder = rewarder
 
-    const tokenAsPair = PairContract.bind(pool.token)
-    const reservesResult = tokenAsPair.try_getReserves()
+    let poolInfo = stakingContract.poolInfo(id)
+
+    let tokenAsPair = PairContract.bind(token)
+    let reservesResult = tokenAsPair.try_getReserves()
     if (!reservesResult.reverted) {
       pool.isPairToken = true
       pool.decimals = BigInt.fromI32(18)
-      const t0 = tokenAsPair.token0()
-      const t1 = tokenAsPair.token1()
-      const token0Symbol = getSymbol(t0)
-      const token1Symbol = getSymbol(t1)
+      let t0 = tokenAsPair.token0()
+      let t1 = tokenAsPair.token1()
+      let token0Symbol = getSymbol(t0)
+      let token1Symbol = getSymbol(t1)
       pool.symbol = token0Symbol.concat('-').concat(token1Symbol)
       pool.name = 'Uniswap V2: '.concat(token0Symbol).concat('-').concat(token1Symbol)
     } else {
       pool.isPairToken = false
-      pool.decimals = getDecimals(pool.token)
-      pool.symbol = getSymbol(pool.token)
-      pool.name = getName(pool.token)
+      pool.decimals = getDecimals(token)
+      pool.symbol = getSymbol(token)
+      pool.name = getName(token)
     }
 
-    pool.token = token
-    pool.rewarder = rewarder
     pool.accRewardsPerShare = poolInfo.value0
     pool.lastRewardBlock = poolInfo.value1
     pool.allocPoint = poolInfo.value2
@@ -137,9 +140,9 @@ export function getPool(id: BigInt, block: ethereum.Block): Pool {
 }
 
 function getHistory(owner: string, block: ethereum.Block): History {
-  const day = block.timestamp.div(BIG_INT_ONE_DAY_SECONDS)
+  let day = block.timestamp.div(BIG_INT_ONE_DAY_SECONDS)
 
-  const id = owner.concat(day.toString())
+  let id = owner.concat(day.toString())
 
   let history = History.load(id)
 
@@ -159,9 +162,9 @@ function getHistory(owner: string, block: ethereum.Block): History {
 }
 
 function getPoolHistory(pool: Pool, block: ethereum.Block): PoolHistory {
-  const day = block.timestamp.div(BIG_INT_ONE_DAY_SECONDS)
+  let day = block.timestamp.div(BIG_INT_ONE_DAY_SECONDS)
 
-  const id = pool.id.concat(day.toString())
+  let id = pool.id.concat(day.toString())
 
   let history = PoolHistory.load(id)
 
@@ -179,14 +182,15 @@ function getPoolHistory(pool: Pool, block: ethereum.Block): PoolHistory {
     history.exitUSD = BIG_DECIMAL_ZERO
     history.rewardsHarvested = BIG_DECIMAL_ZERO
     history.rewardsHarvestedUSD = BIG_DECIMAL_ZERO
+    history.userCount = BIG_INT_ZERO
   }
 
   return history as PoolHistory
 }
 
 export function getUser(pid: BigInt, address: Address, block: ethereum.Block): User {
-  const uid = address.toHex()
-  const id = pid.toString().concat('-').concat(uid)
+  let uid = address.toHex()
+  let id = pid.toString().concat('-').concat(uid)
 
   let user = User.load(id)
 
@@ -209,11 +213,12 @@ export function getUser(pid: BigInt, address: Address, block: ethereum.Block): U
 }
 
 export function logPoolAddition(event: LogPoolAddition): void {
-  const staking = getMultiTokenStaking(event.block)
+  log.info('Adding Pool #{}', [event.params.pid.toString()])
+  let staking = getMultiTokenStaking(event.block)
 
-  log.info('Add pool #{}', [staking.poolCount.toString()])
+  // log.info('Add pool #{}', [staking.poolCount.toString()])
 
-  const pool = getPool(staking.poolCount, event.block)
+  let pool = getPool(event.params.pid, event.block)
 
   // Update MultiTokenStaking.
   staking.totalAllocPoint = staking.totalAllocPoint.plus(pool.allocPoint)
@@ -221,8 +226,8 @@ export function logPoolAddition(event: LogPoolAddition): void {
   staking.save()
 }
 
-export function setPointsAllocator(event: PointsAllocatorSet): void {
-  const staking = getMultiTokenStaking(event.block)
+export function pointsAllocatorSet(event: PointsAllocatorSet): void {
+  let staking = getMultiTokenStaking(event.block)
   staking.pointsAllocator = event.params.pointsAllocator
   staking.save()
 }
@@ -235,9 +240,9 @@ export function logSetPool(event: LogSetPool): void {
   //   call.inputs._withUpdate ? 'true' : 'false',
   // ])
 
-  const pool = getPool(event.params.pid, event.block)
+  let pool = getPool(event.params.pid, event.block)
 
-  const staking = getMultiTokenStaking(event.block)
+  let staking = getMultiTokenStaking(event.block)
   staking.totalAllocPoint = staking.totalAllocPoint.minus(pool.allocPoint).plus(event.params.allocPoint)
   staking.save()
 
@@ -250,9 +255,9 @@ export function logSetPool(event: LogSetPool): void {
 export function logUpdatePool(event: LogUpdatePool): void {
   log.info('Update pool id {}', [event.params.pid.toString()])
 
-  const staking = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
-  const poolInfo = staking.poolInfo(event.params.pid)
-  const pool = getPool(event.params.pid, event.block)
+  let staking = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
+  let poolInfo = staking.poolInfo(event.params.pid)
+  let pool = getPool(event.params.pid, event.block)
   pool.accRewardsPerShare = poolInfo.value0
   pool.lastRewardBlock = poolInfo.value1
   pool.save()
@@ -267,7 +272,7 @@ export function deposit(event: Deposit): void {
   //   ])
   // }
 
-  const amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
+  let amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
 
   // log.info('{} has deposited {} staked tokens to pool #{}', [
   //   event.params.user.toHex(),
@@ -276,23 +281,23 @@ export function deposit(event: Deposit): void {
   // ])
 
 
-  const staking = getMultiTokenStaking(event.block)
+  let staking = getMultiTokenStaking(event.block)
 
-  const stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
+  let stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
 
-  const poolInfo = stakingContract.poolInfo(event.params.pid)
+  let poolInfo = stakingContract.poolInfo(event.params.pid)
 
-  const pool = getPool(event.params.pid, event.block)
+  let pool = getPool(event.params.pid, event.block)
+  log.info('Depositing some tokens to pool # {}', [ event.params.pid.toString() ])
+  let poolHistory = getPoolHistory(pool, event.block)
 
-  const poolHistory = getPoolHistory(pool, event.block)
-
-  const pairContract = ERC20Contract.bind(pool.token)
+  let pairContract = ERC20Contract.bind(pool.token as Address)
   pool.balance = pairContract.balanceOf(MULTI_TOKEN_STAKING_ADDRESS)
 
   pool.accRewardsPerShare = poolInfo.value0
   pool.lastRewardBlock = poolInfo.value1
 
-  const poolDays = event.block.timestamp.minus(pool.updatedAt).divDecimal(BigDecimal.fromString('86400'))
+  let poolDays = event.block.timestamp.minus(pool.updatedAt).divDecimal(BigDecimal.fromString('86400'))
   pool.stakedAge = pool.stakedAge.plus(poolDays.times(pool.stakedBalance))
 
   pool.stakedDeposited = pool.stakedDeposited.plus(amount)
@@ -300,9 +305,9 @@ export function deposit(event: Deposit): void {
 
   pool.updatedAt = event.block.timestamp
 
-  const userInfo = stakingContract.userInfo(event.params.pid, event.params.user)
+  let userInfo = stakingContract.userInfo(event.params.pid, event.params.user)
 
-  const user = getUser(event.params.pid, event.params.user, event.block)
+  let user = getUser(event.params.pid, event.params.user, event.block)
 
   // If not currently in pool and depositing staked token
   if (!user.pool && event.params.amount.gt(BIG_INT_ZERO)) {
@@ -315,7 +320,7 @@ export function deposit(event: Deposit): void {
   user.rewardDebt = userInfo.value1
 
   if (event.params.amount.gt(BIG_INT_ZERO)) {
-    const entryUSD = amount.times(getUSDRate(pool.token))
+    let entryUSD = amount.times(getUSDRate(pool.token as Address, pool.decimals))
     user.entryUSD = user.entryUSD.plus(entryUSD)
     pool.entryUSD = pool.entryUSD.plus(entryUSD)
     poolHistory.entryUSD = pool.entryUSD
@@ -324,7 +329,7 @@ export function deposit(event: Deposit): void {
   user.save()
   pool.save()
 
-  const masterChefDays = event.block.timestamp.minus(staking.updatedAt).divDecimal(BigDecimal.fromString('86400'))
+  let masterChefDays = event.block.timestamp.minus(staking.updatedAt).divDecimal(BigDecimal.fromString('86400'))
   staking.stakedAge = staking.stakedAge.plus(masterChefDays.times(staking.stakedBalance))
 
   staking.stakedDeposited = staking.stakedDeposited.plus(amount)
@@ -333,7 +338,7 @@ export function deposit(event: Deposit): void {
   staking.updatedAt = event.block.timestamp
   staking.save()
 
-  const history = getHistory(MULTI_TOKEN_STAKING_ADDRESS.toHex(), event.block)
+  let history = getHistory(MULTI_TOKEN_STAKING_ADDRESS.toHex(), event.block)
   history.stakedAge = staking.stakedAge
   history.stakedBalance = staking.stakedBalance
   history.stakedDeposited = history.stakedDeposited.plus(amount)
@@ -347,17 +352,18 @@ export function deposit(event: Deposit): void {
 }
 
 export function harvest(event: Harvest): void {
-  const pool = getPool(event.params.pid, event.block)
-  const poolHistory = getPoolHistory(pool, event.block)
-  const user = getUser(event.params.pid, event.params.user, event.block)
+  log.info('Got harvest event for pool # {}', [ event.params.pid.toString() ])
+  let pool = getPool(event.params.pid, event.block)
+  let poolHistory = getPoolHistory(pool, event.block)
+  let user = getUser(event.params.pid, event.params.user, event.block)
 
-  const amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
+  let amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
+  log.info('Harvesting {} REWARDS', [amount.toString()])
 
   // Calculate SUSHI being paid out
   if (event.params.amount.gt(BIG_INT_ZERO)) {
     if (amount.gt(BIG_DECIMAL_ZERO)) {
-      // log.info('Harvesting {} SUSHI', [pending.toString()])
-      const rewardsHarvestedUSD = amount.times(getRewardsTokenPrice())
+      let rewardsHarvestedUSD = amount.times(getRewardsTokenPrice())
       user.rewardsHarvested = user.rewardsHarvested.plus(amount)
       user.rewardsHarvestedUSD = user.rewardsHarvestedUSD.plus(rewardsHarvestedUSD)
       pool.rewardsHarvested = pool.rewardsHarvested.plus(amount)
@@ -379,7 +385,7 @@ export function withdraw(event: Withdraw): void {
   //   ])
   // }
 
-  const amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
+  let amount = event.params.amount.divDecimal(BIG_DECIMAL_1E18)
 
   // log.info('{} has withdrawn {} staked tokens from pool #{}', [
   //   event.params.user.toHex(),
@@ -387,34 +393,34 @@ export function withdraw(event: Withdraw): void {
   //   event.params.pid.toString(),
   // ])
 
-  const staking = getMultiTokenStaking(event.block)
+  let staking = getMultiTokenStaking(event.block)
 
-  const stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
+  let stakingContract = MultiTokenStakingContract.bind(MULTI_TOKEN_STAKING_ADDRESS)
 
-  const poolInfo = stakingContract.poolInfo(event.params.pid)
+  let poolInfo = stakingContract.poolInfo(event.params.pid)
 
-  const pool = getPool(event.params.pid, event.block)
+  let pool = getPool(event.params.pid, event.block)
 
-  const poolHistory = getPoolHistory(pool, event.block)
+  let poolHistory = getPoolHistory(pool, event.block)
 
-  const pairContract = ERC20Contract.bind(pool.token)
+  let pairContract = ERC20Contract.bind(pool.token as Address)
   pool.balance = pairContract.balanceOf(MULTI_TOKEN_STAKING_ADDRESS)
   pool.accRewardsPerShare = poolInfo.value0
   pool.lastRewardBlock = poolInfo.value1
 
-  const poolDays = event.block.timestamp.minus(pool.updatedAt).divDecimal(BigDecimal.fromString('86400'))
-  const poolAge = pool.stakedAge.plus(poolDays.times(pool.stakedBalance))
-  const poolAgeRemoved = poolAge.div(pool.stakedBalance).times(amount)
+  let poolDays = event.block.timestamp.minus(pool.updatedAt).divDecimal(BigDecimal.fromString('86400'))
+  let poolAge = pool.stakedAge.plus(poolDays.times(pool.stakedBalance))
+  let poolAgeRemoved = poolAge.div(pool.stakedBalance).times(amount)
   pool.stakedAge = poolAge.minus(poolAgeRemoved)
   pool.stakedAgeRemoved = pool.stakedAgeRemoved.plus(poolAgeRemoved)
   pool.stakedWithdrawn = pool.stakedWithdrawn.plus(amount)
   pool.stakedBalance = pool.stakedBalance.minus(amount)
   pool.updatedAt = event.block.timestamp
 
-  const user = getUser(event.params.pid, event.params.user, event.block)
+  let user = getUser(event.params.pid, event.params.user, event.block)
 
   // if (event.block.number.gt(staking.startBlock) && user.amount.gt(BIG_INT_ZERO)) {
-  //   const pending = user.amount
+  //   let pending = user.amount
   //     .toBigDecimal()
   //     .times(pool.accRewardsPerShare.toBigDecimal())
   //     .div(BIG_DECIMAL_1E12)
@@ -430,7 +436,7 @@ export function withdraw(event: Withdraw): void {
   //     //   pending.toString(),
   //     //   getRewardsTokenPrice(event.block).toString(),
   //     // ])
-  //     const rewardsHarvestedUSD = pending.times(getRewardsTokenPrice())
+  //     let rewardsHarvestedUSD = pending.times(getRewardsTokenPrice())
   //     user.rewardsHarvested = user.rewardsHarvested.plus(pending)
   //     user.rewardsHarvestedUSD = user.rewardsHarvestedUSD.plus(rewardsHarvestedUSD)
   //     pool.rewardsHarvested = pool.rewardsHarvested.plus(pending)
@@ -440,13 +446,13 @@ export function withdraw(event: Withdraw): void {
   //   }
   // }
 
-  const userInfo = stakingContract.userInfo(event.params.pid, event.params.user)
+  let userInfo = stakingContract.userInfo(event.params.pid, event.params.user)
 
   user.amount = userInfo.value0
   user.rewardDebt = userInfo.value1
 
   if (event.params.amount.gt(BIG_INT_ZERO)) {
-    const exitUSD = amount.times(getUSDRate(pool.token))
+    let exitUSD = amount.times(getUSDRate(pool.token as Address, pool.decimals))
 
     pool.exitUSD = pool.exitUSD.plus(exitUSD)
 
@@ -476,9 +482,9 @@ export function withdraw(event: Withdraw): void {
   user.save()
   pool.save()
 
-  const days = event.block.timestamp.minus(staking.updatedAt).divDecimal(BigDecimal.fromString('86400'))
-  const stakedAge = staking.stakedAge.plus(days.times(staking.stakedBalance))
-  const stakedAgeRemoved = stakedAge.div(staking.stakedBalance).times(amount)
+  let days = event.block.timestamp.minus(staking.updatedAt).divDecimal(BigDecimal.fromString('86400'))
+  let stakedAge = staking.stakedAge.plus(days.times(staking.stakedBalance))
+  let stakedAgeRemoved = stakedAge.div(staking.stakedBalance).times(amount)
   staking.stakedAge = stakedAge.minus(stakedAgeRemoved)
   staking.stakedAgeRemoved = staking.stakedAgeRemoved.plus(stakedAgeRemoved)
 
@@ -487,7 +493,7 @@ export function withdraw(event: Withdraw): void {
   staking.updatedAt = event.block.timestamp
   staking.save()
 
-  const history = getHistory(MULTI_TOKEN_STAKING_ADDRESS.toHex(), event.block)
+  let history = getHistory(MULTI_TOKEN_STAKING_ADDRESS.toHex(), event.block)
   history.stakedAge = staking.stakedAge
   history.stakedAgeRemoved = history.stakedAgeRemoved.plus(stakedAgeRemoved)
   history.stakedBalance = staking.stakedBalance
@@ -509,14 +515,14 @@ export function emergencyWithdraw(event: EmergencyWithdraw): void {
     event.params.pid.toString(),
   ])
 
-  const pool = getPool(event.params.pid, event.block)
+  let pool = getPool(event.params.pid, event.block)
 
-  const pairContract = ERC20Contract.bind(pool.token as Address)
+  let pairContract = ERC20Contract.bind(pool.token as Address)
   pool.balance = pairContract.balanceOf(MULTI_TOKEN_STAKING_ADDRESS)
   pool.save()
 
   // Update user
-  const user = getUser(event.params.pid, event.params.user, event.block)
+  let user = getUser(event.params.pid, event.params.user, event.block)
   user.amount = BIG_INT_ZERO
   user.rewardDebt = BIG_INT_ZERO
 
@@ -528,7 +534,13 @@ export function ownershipTransferred(event: OwnershipTransferred): void {
     event.params.previousOwner.toHex(),
     event.params.newOwner.toHex(),
   ])
-  const staking = getMultiTokenStaking(event.block)
+  let staking = getMultiTokenStaking(event.block)
   staking.owner = event.params.newOwner
+  staking.save()
+}
+
+export function rewardsAdded(event: RewardsAdded): void {
+  let staking = getMultiTokenStaking(event.block)
+  staking.totalRewardsReceived = staking.totalRewardsReceived.plus(event.params.amount)
   staking.save()
 }

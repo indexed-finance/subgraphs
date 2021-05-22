@@ -1,6 +1,6 @@
-specVersion: 0.0.3
-description: Masterchef
-repository: https://github.com/sushiswap/sushiswap-subgraph
+specVersion: 0.0.1
+description: Staking rewards for multiple tokens
+repository: https://github.com/indexed-finance/subgraphs
 schema:
   file: ./multitokenstaking.graphql
 dataSources:

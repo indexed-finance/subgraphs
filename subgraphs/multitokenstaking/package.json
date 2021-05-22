@@ -6,12 +6,9 @@
     "scripts": {
         "codegen": "graph codegen multitokenstaking.yaml",
         "build": "graph build multitokenstaking.yaml",
-        "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ sushiswap/multitokenstaking multitokenstaking.yaml",
-        "create-local": "graph create --node http://localhost:8020/ /sushiswap/sushiswap",
-        "remove-local": "graph remove --node http://localhost:8020/ /sushiswap/sushiswap",
-        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 /sushiswap/sushiswap",
-        "prepare:bsc": "mustache config/bsc.json multitokenstaking.template.yaml > multitokenstaking.yaml",
-        "prepare:mainnet": "mustache config/mainnet.json multitokenstaking.template.yaml > multitokenstaking.yaml",
-        "prepare:rinkeby": "mustache config/rinkeby.json multitokenstaking.template.yaml > multitokenstaking.yaml"
+        "deploy:rinkeby": "yarn prepare:rinkeby && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-staking multitokenstaking.yaml",
+        "prepare:rinkeby": "mustache config/rinkeby.json multitokenstaking.template.yaml > multitokenstaking.yaml",
+        "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/staking multitokenstaking.yaml",
+        "prepare:mainnet": "mustache config/mainnet.json multitokenstaking.template.yaml > multitokenstaking.yaml"
     }
 }

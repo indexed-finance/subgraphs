@@ -1,6 +1,6 @@
-specVersion: 0.0.3
-description: Masterchef
-repository: https://github.com/sushiswap/sushiswap-subgraph
+specVersion: 0.0.2
+description: Staking rewards for multiple tokens
+repository: https://github.com/indexed-finance/subgraphs
 schema:
   file: ./multitokenstaking.graphql
 dataSources:
@@ -8,9 +8,9 @@ dataSources:
     name: MultiTokenStaking
     network: mainnet
     source:
-      address: '0xc2edad668740f1aa35e4d8f227fb8e17dca888cd'
+      address: '0xC46E0E7eCb3EfCC417f6F89b940FFAFf72556382'
       abi: MultiTokenStaking
-      startBlock: 10736242
+      startBlock: 12453240
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

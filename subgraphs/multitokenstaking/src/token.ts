@@ -17,14 +17,14 @@ export function getSymbol(address: Address): string {
     return 'yUSD'
   }
 
-  const contract = ERC20.bind(address)
-  const contractSymbolBytes = ERC20SymbolBytes.bind(address)
+  let  contract = ERC20.bind(address)
+  let  contractSymbolBytes = ERC20SymbolBytes.bind(address)
 
   // try types string and bytes32 for symbol
   let symbolValue = 'unknown'
-  const symbolResult = contract.try_symbol()
+  let  symbolResult = contract.try_symbol()
   if (symbolResult.reverted) {
-    const symbolResultBytes = contractSymbolBytes.try_symbol()
+    let  symbolResultBytes = contractSymbolBytes.try_symbol()
     if (!symbolResultBytes.reverted) {
       // for broken pairs that have no symbol function exposed
       if (symbolResultBytes.value.toHex() != NULL_CALL_RESULT_VALUE) {
@@ -39,27 +39,14 @@ export function getSymbol(address: Address): string {
 }
 
 export function getName(address: Address): string {
-  if (address.toHex() == '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a') {
-    return 'DGD'
-  }
-  if (address.toHex() == '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-    return 'Aave Token'
-  }
-  if (address.toHex() == '0x5dbcf33d8c2e976c6b560249878e6f1491bca25c') {
-    return 'yUSD'
-  }
-  if (address.toHex() == '0xf94b5c5651c888d928439ab6514b93944eee6f48') {
-    return 'Yield App'
-  }
-
-  const contract = ERC20.bind(address)
-  const contractNameBytes = ERC20NameBytes.bind(address)
+  let contract = ERC20.bind(address as Address)
+  let contractNameBytes = ERC20NameBytes.bind(address as Address)
 
   // try types string and bytes32 for name
   let nameValue = 'unknown'
-  const nameResult = contract.try_name()
+  let nameResult = contract.try_name()
   if (nameResult.reverted) {
-    const nameResultBytes = contractNameBytes.try_name()
+    let nameResultBytes = contractNameBytes.try_name()
     if (!nameResultBytes.reverted) {
       // for broken exchanges that have no name function exposed
       if (nameResultBytes.value.toHex() != NULL_CALL_RESULT_VALUE) {
@@ -74,17 +61,12 @@ export function getName(address: Address): string {
 }
 
 export function getDecimals(address: Address): BigInt {
-  // hardcode overrides
-  if (address.toHex() == '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-    return BigInt.fromI32(18)
-  }
-
-  const contract = ERC20.bind(address)
+  let  contract = ERC20.bind(address)
 
   // try types uint8 for decimals
   let decimalValue = null
 
-  const decimalResult = contract.try_decimals()
+  let decimalResult = contract.try_decimals()
 
   if (!decimalResult.reverted) {
     decimalValue = decimalResult.value
