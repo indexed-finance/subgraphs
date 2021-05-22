@@ -1,7 +1,7 @@
 {
   "name": "pricing",
   "version": "1.0.0",
-  "description": "Common logic and utilities to use throughout the project",
+  "description": "Pricing logic and utilities to use throughout the project",
   "license": "MIT",
   "private": true,
   "main": "index.ts",
