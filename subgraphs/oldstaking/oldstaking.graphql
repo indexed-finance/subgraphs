@@ -1,0 +1,15 @@
+type NdxStakingPool @entity {
+  id: ID!
+  startsAt: Int!
+  isReady: Boolean!
+  isWethPair: Boolean!
+  indexPool: Bytes!
+  stakingToken: Bytes!
+  totalSupply: BigInt!
+  rewardPerTokenStored: BigInt!
+  periodFinish: Int!
+  lastUpdateTime: Int!
+  totalRewards: BigInt!
+  claimedRewards: BigInt!
+  rewardRate: BigInt!
+}

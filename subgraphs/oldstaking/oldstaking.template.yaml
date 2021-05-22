@@ -1,0 +1,73 @@
+specVersion: 0.0.2
+description: Outdated staking pools for Indexed Finance. This subgraph exists so people with staked tokens can track expired pools.
+repository: https://github.com/indexed-finance/subgraphs
+schema:
+  file: ./oldstaking.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: StakingRewardsFactory
+    network: {{ network }}
+    source:
+      address: '{{ factoryAddress }}'
+      abi: StakingRewardsFactory
+      startBlock: {{ factoryStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - NdxStakingPool
+      abis:
+        - name: StakingRewardsFactory
+          file: ../../packages/abis/StakingRewardsFactory.json
+      eventHandlers:
+        - event: IndexPoolStakingRewardsAdded(address,address)
+          handler: handleIndexPoolRewardsAdded
+        - event: UniswapStakingRewardsAdded(address,address,address)
+          handler: handleUniswapStakingRewardsAdded
+      file: ./src/factory.ts
+  - kind: ethereum/contract
+    name: SigmaRewardsFactory
+    network: mainnet
+    source:
+      address: '{{ sigaFactoryAddress }}'
+      abi: SigmaRewardsFactory
+      startBlock: {{ sigaFactoryStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - NdxStakingPool
+      abis:
+        - name: SigmaRewardsFactory
+          file: ../../packages/abis/SigmaRewardsFactory.json
+      eventHandlers:
+        - event: UniswapStakingRewardsAdded(address,address,address)
+          handler: handleUniswapStakingRewardsAdded
+      file: ./src/sigma-factory.ts
+templates:
+  - name: StakingRewards
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - NdxStakingPool
+      abis:
+        - name: StakingRewards
+          file: ../../packages/abis/StakingRewards.json
+      eventHandlers:
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
+      file: ./src/rewards.ts

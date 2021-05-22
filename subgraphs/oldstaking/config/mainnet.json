@@ -1,0 +1,7 @@
+{
+  "network": "mainnet",
+  "factoryAddress": "0x48887E27e3E42e769F34e1e43E857235035d333a",
+  "factoryStartBlock": "11458705",
+  "sigaFactoryAddress": "0x4246863cf318f930a955f4bab2a9277c21e3b0bb",
+  "sigaFactoryStartBlock": "11959538"
+}

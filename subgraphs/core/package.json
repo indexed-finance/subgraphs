@@ -1,0 +1,19 @@
+{
+    "name": "pools",
+    "license": "MIT",
+    "version": "1.0.0",
+    "files": [
+        "generated"
+    ],
+    "scripts": {
+        "codegen": "graph codegen pools.yaml",
+        "build": "graph build pools.yaml",
+        "create-local": "graph create --node http://localhost:8020/ indexed-finance/indexed-pools",
+        "remove-local": "graph remove --node http://localhost:8020/ indexed-finance/indexed-pools",
+        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 indexed-finance/indexed-pools",
+        "deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/indexed-pools",
+        "deploy:rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-indexed-pools",
+        "prepare:mainnet": "mustache config/mainnet.json pools.template.yaml > pools.yaml",
+        "prepare:rinkeby": "mustache config/rinkeby.json pools.template.yaml > pools.yaml"
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "network": "rinkeby",
+  "factoryAddress": "0x8d12A344580Bc0bC4E684248067F5d9d3908C864",
+  "factoryStartBlock": "7768607",
+  "sigaFactoryAddress": "0x8d12A344580Bc0bC4E684248067F5d9d3908C864",
+  "sigaFactoryStartBlock": "7768607"
+}

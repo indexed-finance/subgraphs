@@ -1,0 +1,19 @@
+{
+    "name": "oldstaking",
+    "license": "MIT",
+    "version": "1.0.0",
+    "files": [
+        "generated"
+    ],
+    "scripts": {
+        "codegen": "graph codegen oldstaking.yaml",
+        "build": "graph build oldstaking.yaml",
+        "create-local": "graph create --node http://localhost:8020/ indexed-finance/indexed-old-staking",
+        "remove-local": "graph remove --node http://localhost:8020/ indexed-finance/indexed-old-staking",
+        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 indexed-finance/indexed-old-staking",
+        "deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/indexed-old-staking oldstaking.yaml",
+        "deploy:rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-indexed-old-staking oldstaking.yaml",
+        "prepare:mainnet": "mustache config/mainnet.json oldstaking.template.yaml > oldstaking.yaml",
+        "prepare:rinkeby": "mustache config/rinkeby.json oldstaking.template.yaml > oldstaking.yaml"
+    }
+}
