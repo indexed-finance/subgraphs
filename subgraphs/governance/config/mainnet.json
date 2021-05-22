@@ -1,0 +1,9 @@
+{
+    "network": "mainnet",
+    "governorAlphaAddress": "0x95129751769f99cc39824a0793ef4933dd8bb74b",
+    "governorAlphaStartBlock": "11457782",
+    "indexedTokenAddress": "0x86772b1409b61c639eaac9ba0acfbb6e238e5f83",
+    "indexedTokenStartBlock": "11457421",
+    "metaGovernorCOMPAddress": "0xeeb40d10cb86f569bb978a81a4ea178a9e1dfddf",
+    "metaGovernorCOMPStartBlock": "11742296"
+}

@@ -1,0 +1,89 @@
+specVersion: 0.0.2
+description: Indexed governance subgraph
+repository: https://github.com/indexed-finance/subgraphs
+schema:
+  file: ./governance.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GovernorAlpha
+    network: {{ network }}
+    source:
+      address: '{{ governorAlphaAddress }}'
+      abi: GovernorAlpha
+      startBlock: {{ governorAlphaStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+        - Proposal
+        - Vote
+        - Governance
+      abis:
+        - name: GovernorAlpha
+          file: ../../packages/abis/GovernorAlpha.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: VoteCast(address,uint256,bool,uint256)
+          handler: handleVoteCast
+  - kind: ethereum/contract
+    name: IndexedToken
+    network: {{ network }}
+    source:
+      address: '{{ indexedTokenAddress }}'
+      abi: IndexedToken
+      startBlock: {{ indexedTokenStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+      abis:
+        - name: IndexedToken
+          file: ../../packages/abis/IndexedToken.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+  - kind: ethereum/contract
+    name: MetaGovernorCOMP
+    network: {{ network }}
+    source:
+      address: '{{ metaGovernorCOMPAddress }}'
+      abi: MetaGovernorCOMP
+      startBlock: {{ metaGovernorCOMPStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      file: ./src/comp-meta-mappings.ts
+      entities:
+        - Delegate
+        - TokenHolder
+        - CompMetaProposal
+        - CompMetaVote
+        - Governance
+      abis:
+        - name: MetaGovernorCOMP
+          file: ../../packages/abis/MetaGovernorCOMP.json
+      eventHandlers:
+        - event: ExternalVoteSubmitted(uint256,bool)
+          handler: handleExternalVoteSubmitted
+        - event: MetaVoteCast(address,uint256,bool,uint256)
+          handler: handleMetaVoteCast
