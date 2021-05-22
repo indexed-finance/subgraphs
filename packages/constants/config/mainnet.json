@@ -5,7 +5,7 @@
   "usdc_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   "dai_address": "0x6b175474e89094c44da98b954eedeac495271d0f",
   "uniswap_factory_address": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-  "multi_token_staking_address": "",
+  "multi_token_staking_address": "0xC46E0E7eCb3EfCC417f6F89b940FFAFf72556382",
   "usdc_weth_pair": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
   "dai_weth_pair": "0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11",
   "usdt_weth_pair": "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852"

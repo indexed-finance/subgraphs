@@ -1,11 +1,11 @@
 {
-  "rewards_token_address": "0x0865675e9534523adFb4D8B51c0E02812eCfbc67",
+  "rewards_token_address": "0xE9B837a04Da0f94669EBd99D8CEdc19eaE8F0893",
   "weth_address": "0xc778417e063141139fce010982780140aa0cd5ab",
   "usdt_address": "0xfb1d709cb959ac0ea14cad0927eabc7832e65058",
   "usdc_address": "0x7d66cde53cc0a169cae32712fc48934e610aef14",
   "dai_address": "0x95b58a6bff3d14b7db2f5cb5f0ad413dc2940658",
   "uniswap_factory_address": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-  "multi_token_staking_address": "",
+  "multi_token_staking_address": "0xd4Ca58850bf7814660fb55234EF1fCBDF5c04D60",
   "usdc_weth_pair": "0x6BccBb84fc4125470C09b75990b5BAe7e5D4E6F5",
   "dai_weth_pair": "0xAeDD67865bF51f3b5692eba3B72C0E29b7615BcD",
   "usdt_weth_pair": "0xF1Ea55A2bCbc86dC52A277763c44c0A5425c2ed3"
