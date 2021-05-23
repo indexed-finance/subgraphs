@@ -1,0 +1,189 @@
+# =========================== Tokens (Uniswap & Categories) ===========================
+
+type CategoryManager @entity {
+  id: ID! # ID is always 'CATEGORIES'
+  categoryIndex: Int # Number of categories that exist on the base controller
+  sigmaV1Index: Int # Number of categories that exist on the sigma v1 controller
+  poolsList: [String!]!
+}
+
+type Category @entity {
+  id: ID!
+  metadataHash: Bytes!
+  tokens: [Token!]!
+  indexPools: [IndexPool!]! @derivedFrom(field: "category")
+  strategyAddress: Bytes
+  minScore: BigInt
+  maxScore: BigInt
+}
+
+type Token @entity {
+  # token address
+  id: ID!
+  # mirrored from the smart contract
+  symbol: String!
+  name: String!
+  decimals: Int!
+  # derived prices
+  priceUSD: BigDecimal!
+}
+
+# =========================== Index Pools ===========================
+
+type IndexPool @entity {
+  id: ID!                                                               # index pool address
+  category: Category!                                                   # category the pool indexes
+  name: String!                                                         # erc20 name
+  symbol: String!                                                       # erc20 symbol
+  totalSupply: BigInt!                                                  # total pool tokens that exist
+  maxTotalSupply: BigInt!                                               # maximum pool tokens that can be minted
+  size: Int!                                                            # number of tokens the pool should index at a time
+
+  isPublic: Boolean!                                                    # whether public swaps & joins are enabled
+  initialized: Boolean!                                                 # whether the pool is initialized
+
+  tokensList: [Bytes!]!                                                 # list of pool tokens
+  tokenSeller: TokenSeller @derivedFrom(field: "pool")                  # contract that sells unbound tokens
+  poolInitializer: PoolInitializer @derivedFrom(field: "pool")          # contract that initializes the pool's underlying tokens
+
+  tokens: [PoolUnderlyingToken!] @derivedFrom(field: "pool")            # underlying tokens and balances
+  balances: [IndexPoolBalance!] @derivedFrom(field: "pool")             # user balances of pool tokens
+  totalWeight: BigInt!                                                  # total denormalized weight
+  swapFee: BigDecimal!                                                  # swap fee
+  exitFee: BigDecimal!                                                  # exit fee
+
+  dailySnapshots: [DailyPoolSnapshot!]! @derivedFrom(field: "pool")
+
+  feesTotalUSD: BigDecimal!
+  totalValueLockedUSD: BigDecimal!
+  totalSwapVolumeUSD: BigDecimal!
+  totalVolumeUSD: BigDecimal!
+}
+
+type PoolUnderlyingToken @entity {
+  # id = poolAddress-tokenAddress
+  id: ID!
+  # Whether the token is initialized
+  ready: Boolean!
+  # Index pool the record is for
+  pool: IndexPool!
+  # Pool balance in the token
+  balance: BigInt!
+  # Minimum number of tokens the pool must hold to allow exits
+  minimumBalance: BigInt
+  # Token address (old & now redundant, remove this)
+  token: Token!
+  # Denormalized weight
+  denorm: BigInt!
+  # Target denormalized weight
+  desiredDenorm: BigInt!
+}
+
+type DailyPoolSnapshot @entity {
+  id: ID!
+  date: Int!
+  feesTotalUSD: BigDecimal!
+  totalValueLockedUSD: BigDecimal!
+  totalSwapVolumeUSD: BigDecimal!
+  totalSupply: BigDecimal!
+  value: BigDecimal!
+  tokens: [Bytes!]!
+  balances: [BigInt!]!
+  denorms: [BigInt!]!
+  desiredDenorms: [BigInt!]!
+  pool: IndexPool!
+  totalVolumeUSD: BigDecimal!
+}
+
+type IndexPoolBalance @entity {
+  # id = bal-poolAddress-ownerAddress
+  id: ID!
+  pool: IndexPool!
+  balance: BigInt!
+}
+
+# =========================== Index Pool Initializers ===========================
+
+type PoolInitializer @entity {
+  # Initializer address
+  id: ID!
+  # Address of the pool the initializer is for
+  pool: IndexPool
+  # Tokens the initializer needs
+  tokens: [InitializerToken!]! @derivedFrom(field: "poolInitializer")
+  # Total amount of WETH users have been credited for
+  totalCreditedWETH: BigInt!
+}
+
+type InitializerToken @entity {
+  # ID is initializerAddress-tokenAddress
+  id: ID!
+  # Pool initializer the record is for
+  poolInitializer: PoolInitializer!
+  # Address of the token
+  token: Token!
+  # Target balance
+  targetBalance: BigInt!
+  # Balance of the pool initializer
+  balance: BigInt!
+  # Amount of tokens still needed
+  amountRemaining: BigInt!
+}
+
+type TokenContribution @entity {
+  # ID is initializerAddress-txHash
+  id: ID!
+  transactionHash: Bytes!
+  timestamp: Int!
+  caller: Bytes!
+  token: Token!
+  amount: BigInt!
+  credit: BigInt!
+}
+
+type TokenContributor @entity {
+  # ID is initializerAddress-accountAddress
+  id: ID!
+  credit: BigInt!
+}
+
+# =========================== Unbound Token Sellers ===========================
+
+type TokenSeller @entity {
+  # ID is the address of the unbound token seller
+  id: ID!
+  # Address of the pool the seller is for
+  pool: IndexPool!
+  # Premium for the trader as a percent
+  premium: Int!
+  # Records of tokens being sold
+  tokensForSale: [TokenForSale!] @derivedFrom(field: "tokenSeller")
+}
+
+type TokenForSale @entity {
+  # ID is tokenSellerAddress-tokenAddress
+  id: ID!
+  # Token seller the record is for
+  tokenSeller: TokenSeller!
+  # Address of the token
+  token: Token!
+  # Amount of tokens left to sell
+  amount: BigInt!
+}
+
+# =========================== Events ===========================
+
+type Swap @entity {
+  id: ID!
+  caller: Bytes!
+  tokenIn: Bytes!
+  tokenOut: Bytes!
+  tokenAmountIn: BigInt!
+  tokenAmountOut: BigInt!
+  pool: IndexPool!
+  timestamp: Int!
+}
+
+type Mint @entity {
+  id: ID!
+}
