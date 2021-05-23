@@ -1,6 +1,6 @@
 # Indexed Finance Subgraphs
 
-Contains current and historical data for Indexed Finance.
+Contains current and historical data for Indexed Finance. Work in progress.
 
 <!-- # SushiSwap Subgraph
 
