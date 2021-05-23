@@ -1,4 +1,8 @@
-# SushiSwap Subgraph
+# Indexed Finance Subgraphs
+
+Contains current and historical data for Indexed Finance.
+
+<!-- # SushiSwap Subgraph
 
 Aims to deliver analytics & historical data for SushiSwap. Still a work in progress. Feel free to contribute!
 
@@ -87,4 +91,4 @@ We will add to this as development progresses.
 # Community Subgraphs
 
 1) croco-finance fork of this repo with slight modifications - [deployment](https://thegraph.com/explorer/subgraph/benesjan/sushi-swap), [code](https://github.com/croco-finance/sushiswap-subgraph)
-2) croco-finance dex-rewards-subgraph which tracks SLPs in MasterChef and all the corresponding rewards individually. (can be used for analysis of user's positions) - [deployment](https://thegraph.com/explorer/subgraph/benesjan/dex-rewards-subgraph), [code](https://github.com/croco-finance/dex-rewards-subgraph)
+2) croco-finance dex-rewards-subgraph which tracks SLPs in MasterChef and all the corresponding rewards individually. (can be used for analysis of user's positions) - [deployment](https://thegraph.com/explorer/subgraph/benesjan/dex-rewards-subgraph), [code](https://github.com/croco-finance/dex-rewards-subgraph) -->
