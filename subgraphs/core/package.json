@@ -6,14 +6,14 @@
         "generated"
     ],
     "scripts": {
-        "codegen": "graph codegen pools.yaml",
-        "build": "graph build pools.yaml",
+        "codegen": "graph codegen core.yaml",
+        "build": "graph build core.yaml",
         "create-local": "graph create --node http://localhost:8020/ indexed-finance/core",
         "remove-local": "graph remove --node http://localhost:8020/ indexed-finance/core",
         "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 indexed-finance/core",
-        "deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/core",
-        "deploy:rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-core",
-        "prepare:mainnet": "mustache config/mainnet.json pools.template.yaml > pools.yaml",
-        "prepare:rinkeby": "mustache config/rinkeby.json pools.template.yaml > pools.yaml"
+        "deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/core core.yaml",
+        "deploy:rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-core core.yaml",
+        "prepare:mainnet": "mustache config/mainnet.json core.template.yaml > core.yaml",
+        "prepare:rinkeby": "mustache config/rinkeby.json core.template.yaml > core.yaml"
     }
 }
