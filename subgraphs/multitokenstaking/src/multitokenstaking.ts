@@ -100,6 +100,8 @@ export function getPool(id: BigInt, block: ethereum.Block): Pool {
       pool.decimals = BigInt.fromI32(18)
       let t0 = tokenAsPair.token0()
       let t1 = tokenAsPair.token1()
+      pool.token0 = t0
+      pool.token1 = t1
       let token0Symbol = getSymbol(t0)
       let token1Symbol = getSymbol(t1)
       pool.symbol = token0Symbol.concat('-').concat(token1Symbol)

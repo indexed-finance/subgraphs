@@ -92,6 +92,11 @@ type Pool @entity {
   decimals: BigInt!
   isPairToken: Boolean!
 
+  # Info is pool is a pair
+  token0: Bytes
+  token1: Bytes
+
+
   # Owner
   owner: MultiTokenStaking!
 
