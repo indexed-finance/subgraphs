@@ -1,11 +1,11 @@
-import { LOG_DENORM_UPDATED, LOG_DESIRED_DENORM_SET, LOG_SWAP, LOG_JOIN, LOG_EXIT, Transfer, IPool, LOG_TOKEN_REMOVED, LOG_TOKEN_ADDED, LOG_TOKEN_READY } from "../../generated/templates/IPool/IPool";
-import { PoolUnderlyingToken, IndexPoolBalance, DailyPoolSnapshot, IndexPool, Swap, Token } from "../../generated/schema";
+import { LOG_DENORM_UPDATED, LOG_DESIRED_DENORM_SET, LOG_SWAP, LOG_JOIN, LOG_EXIT, Transfer, IPool, LOG_TOKEN_REMOVED, LOG_TOKEN_ADDED, LOG_TOKEN_READY } from "../generated/templates/IPool/IPool";
+import { PoolUnderlyingToken, IndexPoolBalance, DailyPoolSnapshot, IndexPool, Swap, Token } from "../generated/schema";
 import { Address, ethereum, BigInt, log, Bytes } from "@graphprotocol/graph-ts";
-import { LOG_MAX_TOKENS_UPDATED, LOG_MINIMUM_BALANCE_UPDATED, LOG_SWAP_FEE_UPDATED } from "../../generated/templates/IPool/IPool";
-import { convertEthToDecimal, hexToDecimal, joinHyphen, ZERO_BI } from "../helpers/general";
-import { getTokenPriceUSD } from "../helpers/pricing";
-import { convertTokenToDecimal, ZERO_BD } from "../helpers/general";
-import { ADDRESS_ZERO } from '../helpers/uniswap';
+import { LOG_MAX_TOKENS_UPDATED, LOG_MINIMUM_BALANCE_UPDATED, LOG_SWAP_FEE_UPDATED } from "../generated/templates/IPool/IPool";
+import { ADDRESS_ZERO, BIG_INT_ZERO , BIG_DECIMAL_ZERO} from 'const';
+import { getUSDRate, getDecimals , getTokenPriceUSD} from 'pricing';
+import { getName, getSymbol , convertTokenToDecimal, convertEthToDecimal, hexToDecimal, joinHyphen} from 'utils';
+
 
 function loadUnderlyingToken(poolAddress: Address, tokenAddress: Address): PoolUnderlyingToken {
   let tokenID = joinHyphen([poolAddress.toHexString(), tokenAddress.toHexString()]);
@@ -49,7 +49,7 @@ function updateDailySnapshot(pool: IndexPool, event: ethereum.Event): void {
   let denorms = new Array<BigInt>()
   let desiredDenorms = new Array<BigInt>()
   let tokens = new Array<Bytes>()
-  let totalValueLockedUSD = ZERO_BD
+  let totalValueLockedUSD = BIG_DECIMAL_ZERO
 
   for (let i = 0 as i32; i < tokenAddresses.length; i++) {
     let tokenAddress = tokenAddresses[i]
@@ -59,7 +59,7 @@ function updateDailySnapshot(pool: IndexPool, event: ethereum.Event): void {
     desiredDenorms.push(poolToken.desiredDenorm)
     tokens.push(tokenAddress)
     let token = Token.load(tokenAddress.toHexString())
-    let balance = convertTokenToDecimal(poolToken.balance, token.decimals)
+    let balance = convertTokenToDecimal(poolToken.balance, BigInt.fromI32(token.decimals))
     let value = balance.times(token.priceUSD)
     totalValueLockedUSD = totalValueLockedUSD.plus(value)
   }
@@ -87,7 +87,9 @@ function updateTokenPrices(pool: IndexPool): void {
   for (let i = 0; i < tokenAddresses.length; i++) {
     let tokenAddress = tokenAddresses[i]
     let token = Token.load(tokenAddress.toHexString()) as Token
-    token.priceUSD = getTokenPriceUSD(token)
+    token.priceUSD = getUSDRate(Address.fromString(token.id), BigInt.fromI32(token.decimals))
+    //  token.priceUSD = getTokenPriceUSD(token)
+
     token.save()
   }
 }
@@ -107,7 +109,7 @@ export function handleSwap(event: LOG_SWAP): void {
   updateTokenPrices(pool as IndexPool)
 
   let tokenOut = Token.load(poolTokenOut.token)
-  let tokenAmountOutDecimal = convertTokenToDecimal(event.params.tokenAmountOut, tokenOut.decimals)
+  let tokenAmountOutDecimal = convertTokenToDecimal(event.params.tokenAmountOut, BigInt.fromI32(tokenOut.decimals))
   let swapValue = tokenAmountOutDecimal.times(tokenOut.priceUSD)
   let swapFeeValue = swapValue.times(pool.swapFee)
 
@@ -134,7 +136,7 @@ export function handleSwap(event: LOG_SWAP): void {
 export function handleJoin(event: LOG_JOIN): void {
   let tokenIn = loadUnderlyingToken(event.address, event.params.tokenIn);
   let tokenInStore = Token.load(event.params.tokenIn.toHexString());
-  let tokenInDecimal = convertTokenToDecimal(event.params.tokenAmountIn, tokenInStore.decimals);
+  let tokenInDecimal = convertTokenToDecimal(event.params.tokenAmountIn, BigInt.fromI32(tokenInStore.decimals));
   let pool = IndexPool.load(event.address.toHexString()) as IndexPool;
   let usdValue = tokenInDecimal.times(tokenInStore.priceUSD);
 
@@ -151,7 +153,7 @@ export function handleExit(event: LOG_EXIT): void {
   updateTokenPrices(pool as IndexPool);
   let tokenOut = loadUnderlyingToken(event.address, event.params.tokenOut);
   let tokenOutStore = Token.load(event.params.tokenOut.toHexString());
-  let tokenOutDecimal = convertTokenToDecimal(event.params.tokenAmountOut, tokenOutStore.decimals);
+  let tokenOutDecimal = convertTokenToDecimal(event.params.tokenAmountOut, BigInt.fromI32(tokenOutStore.decimals));
   let usdValue = tokenOutDecimal.times(tokenOutStore.priceUSD);
 
   tokenOut.balance = tokenOut.balance.minus(event.params.tokenAmountOut);
@@ -191,8 +193,8 @@ export function handleDesiredDenormSet(event: LOG_DESIRED_DENORM_SET): void {
 
 export function handleTransfer(event: Transfer): void {
   let pool = IndexPool.load(event.address.toHexString()) as IndexPool
-  let isMint = event.params.src.toHexString() == ADDRESS_ZERO;
-  let isBurn = event.params.dst.toHexString() == ADDRESS_ZERO;
+  let isMint = event.params.src.toHexString() == ADDRESS_ZERO.toHexString();
+  let isBurn = event.params.dst.toHexString() == ADDRESS_ZERO.toHexString();
   if (isMint) {
     pool.totalSupply = pool.totalSupply.plus(event.params.amt);
     pool.save();
@@ -237,9 +239,9 @@ export function handleTokenAdded(event: LOG_TOKEN_ADDED): void {
   token.token = event.params.token.toHexString();
   token.ready = false;
   token.minimumBalance = event.params.minimumBalance;
-  token.denorm = ZERO_BI
+  token.denorm = BIG_INT_ZERO
   token.desiredDenorm = event.params.desiredDenorm;
-  token.balance = ZERO_BI
+  token.balance = BIG_INT_ZERO
   token.pool = event.address.toHexString();
   token.save();
   let pool = IndexPool.load(event.address.toHexString());

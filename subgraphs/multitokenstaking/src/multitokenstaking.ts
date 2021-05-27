@@ -28,7 +28,8 @@ import { getRewardsTokenPrice, getUSDRate } from 'pricing'
 import { ERC20 as ERC20Contract } from '../generated/MultiTokenStaking/ERC20'
 import { Pair as PairContract } from '../generated/MultiTokenStaking/Pair'
 import { RewardsSchedule as RewardsScheduleContract } from '../generated/MultiTokenStaking/RewardsSchedule'
-import { getDecimals, getName, getSymbol } from './token'
+import {  getName, getSymbol } from 'utils'
+import { getDecimals } from 'pricing'
 
 function getMultiTokenStaking(block: ethereum.Block): MultiTokenStaking {
   let staking = MultiTokenStaking.load(MULTI_TOKEN_STAKING_ADDRESS.toHex())

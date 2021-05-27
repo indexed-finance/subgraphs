@@ -15,5 +15,8 @@
         "deploy:rinkeby": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/rinkeby-core core.yaml",
         "prepare:mainnet": "mustache config/mainnet.json core.template.yaml > core.yaml",
         "prepare:rinkeby": "mustache config/rinkeby.json core.template.yaml > core.yaml"
+    },
+    "devDependencies": {
+        "@graphprotocol/graph-ts": "^0.20.0"
     }
 }

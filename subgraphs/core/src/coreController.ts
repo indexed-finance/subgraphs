@@ -4,27 +4,26 @@ import {
   PoolInitializer as Initializer,
   InitializerToken,
   TokenSeller
-} from '../../generated/schema';
-import { CategoryAdded, CategorySorted, MarketCapSqrtController, TokenAdded, TokenRemoved } from '../../generated/MarketCapSqrtController/MarketCapSqrtController';
-import { Category, Token, CategoryManager } from '../../generated/schema';
+} from '../generated/schema';
+import { CategoryAdded, CategorySorted, MarketCapSqrtController, TokenAdded, TokenRemoved } from '../generated/MarketCapSqrtController/MarketCapSqrtController';
+import { Category, Token, CategoryManager } from '../generated/schema';
 
-import { IPool, PoolInitializer, UnboundTokenSeller } from '../../generated/templates';
+import { IPool, PoolInitializer, UnboundTokenSeller } from '../generated/templates';
 
-import { UnboundTokenSeller as SellerContract } from '../../generated/templates/UnboundTokenSeller/UnboundTokenSeller';
-import { IPool as IPoolContract } from '../../generated/templates/IPool/IPool';
-import { PoolInitializer as PoolInitializerContract } from '../../generated/templates/PoolInitializer/PoolInitializer';
+import { UnboundTokenSeller as SellerContract } from '../generated/templates/UnboundTokenSeller/UnboundTokenSeller';
+import { IPool as IPoolContract } from '../generated/templates/IPool/IPool';
+import { PoolInitializer as PoolInitializerContract } from '../generated/templates/PoolInitializer/PoolInitializer';
 
 import {
   NewPoolInitializer,
   PoolInitialized
-} from '../../generated/MarketCapSqrtController/MarketCapSqrtController';
+} from '../generated/MarketCapSqrtController/MarketCapSqrtController';
 
 import { BigInt, Bytes, log } from '@graphprotocol/graph-ts';
-import { hexToDecimal, ZERO_BI } from "../helpers/general";
-import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from '../helpers/uniswap';
-import { ZERO_BD } from '../helpers/general'
-import { getTokenPriceUSD } from '../helpers/pricing';
-import { getCategoryManager } from '../helpers/categories';
+import { getName, getSymbol , hexToDecimal} from 'utils';
+import { BIG_DECIMAL_ZERO , BIG_INT_ZERO} from 'const'
+import { getUSDRate, getDecimals } from 'pricing';
+import { getCategoryManager } from './categories';
 
 export function handleNewCategory(event: CategoryAdded): void {
   let categoryManager = getCategoryManager();
@@ -43,10 +42,10 @@ export function handleTokenAdded(event: TokenAdded): void {
   let token = Token.load(tokenAddress);
   if (token == null) {
     token = new Token(tokenAddress);
-    token.decimals = fetchTokenDecimals(event.params.token);
-    token.name = fetchTokenName(event.params.token);
-    token.symbol = fetchTokenSymbol(event.params.token);
-    token.priceUSD = getTokenPriceUSD(token as Token)
+    token.decimals = getDecimals(event.params.token).toI32();
+    token.name = getName(event.params.token);
+    token.symbol = getSymbol(event.params.token);
+    token.priceUSD = getUSDRate(event.params.token, getDecimals(event.params.token))
     token.save();
   }
   if (category.tokens == null) category.tokens = [];
@@ -124,10 +123,10 @@ export function handleNewPool(event: NewPoolInitializer): void {
   pool.totalWeight = new BigInt(0);
   pool.totalSupply = new BigInt(0);
   pool.maxTotalSupply = new BigInt(0);
-  pool.feesTotalUSD = ZERO_BD
-  pool.totalValueLockedUSD = ZERO_BD
-  pool.totalSwapVolumeUSD = ZERO_BD
-  pool.totalVolumeUSD = ZERO_BD
+  pool.feesTotalUSD = BIG_DECIMAL_ZERO
+  pool.totalValueLockedUSD = BIG_DECIMAL_ZERO
+  pool.totalSwapVolumeUSD = BIG_DECIMAL_ZERO
+  pool.totalVolumeUSD = BIG_DECIMAL_ZERO
   pool.isPublic = false;
   pool.initialized = false;
   pool.name = ipool.name();
@@ -135,7 +134,7 @@ export function handleNewPool(event: NewPoolInitializer): void {
   pool.tokensList = new Array<Bytes>()
   let swapFee = ipool.getSwapFee()
   pool.swapFee = hexToDecimal(swapFee.toHexString(), 18);
-  pool.exitFee = ZERO_BD;
+  pool.exitFee = BIG_DECIMAL_ZERO;
   pool.save();
 }
 
@@ -167,7 +166,7 @@ export function handlePoolInitialized(event: PoolInitialized): void {
   pool.totalSupply = ipool.totalSupply();
   let swapFee = ipool.getSwapFee();
   pool.swapFee = hexToDecimal(swapFee.toHexString(), 18);
-  pool.exitFee = ZERO_BD;
+  pool.exitFee = BIG_DECIMAL_ZERO;
   // Set up the pool tokens
   let tokensList = new Array<Bytes>()
   let tokens = ipool.getCurrentTokens();

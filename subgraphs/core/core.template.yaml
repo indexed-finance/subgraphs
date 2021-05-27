@@ -31,11 +31,11 @@ dataSources:
         - name: UnboundTokenSeller
           file: ../../packages/abis/UnboundTokenSeller.json
         - name: IERC20
-          file: ../../packages/abis/IERC20.json
+          file: ../../packages/abis/ERC20.json
         - name: Pair
-          file: ../../packages/abis/Pair.json
+          file: ../../packages/abis/UniswapV2Pair.json
         - name: Factory
-          file: ../../packages/abis/Factory.json
+          file: ../../packages/abis/UniswapV2Factory.json
       eventHandlers:
         - event: NewPoolInitializer(address,address,uint256,uint256)
           handler: handleNewPool
@@ -77,11 +77,11 @@ dataSources:
         - name: UnboundTokenSeller
           file: ../../packages/abis/UnboundTokenSeller.json
         - name: IERC20
-          file: ../../packages/abis/IERC20.json
+          file: ../../packages/abis/ERC20.json
         - name: Pair
-          file: ../../packages/abis/Pair.json
+          file: ../../packages/abis/UniswapV2Pair.json
         - name: Factory
-          file: ../../packages/abis/Factory.json
+          file: ../../packages/abis/UniswapV2Factory.json
       eventHandlers:
         - event: NewPoolInitializer(address,address,uint256,uint256)
           handler: handleNewPool
@@ -143,7 +143,7 @@ templates:
         - name: PoolInitializer
           file: ../../packages/abis/PoolInitializer.json
         - name: IERC20
-          file: ../../packages/abis/IERC20.json
+          file: ../../packages/abis/ERC20.json
       eventHandlers:
         - event: TokensContributed(address,address,uint256,uint256)
           handler: handleTokensContributed
@@ -168,11 +168,11 @@ templates:
         - name: IPool
           file: ../../packages/abis/IPool.json
         - name: IERC20
-          file: ../../packages/abis/IERC20.json
+          file: ../../packages/abis/ERC20.json
         - name: Pair
-          file: ../../packages/abis/Pair.json
+          file: ../../packages/abis/UniswapV2Pair.json
         - name: Factory
-          file: ../../packages/abis/Factory.json
+          file: ../../packages/abis/UniswapV2Factory.json
       eventHandlers:
         - event: LOG_SWAP(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleSwap

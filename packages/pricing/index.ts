@@ -18,7 +18,7 @@ import { Address, Bytes, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts
 import { Factory as FactoryContract } from 'multitokenstaking/generated/MultiTokenStaking/Factory'
 import { Pair as PairContract } from 'multitokenstaking/generated/MultiTokenStaking/Pair'
 
-function getDecimals(address: Address): BigInt {
+export function getDecimals(address: Address): BigInt {
   let  contract = PairContract.bind(address)
 
   // try types uint8 for decimals

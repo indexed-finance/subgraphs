@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { InitializerToken, PoolInitializer, TokenContribution, TokenContributor } from "../../generated/schema";
-import { TokensContributed, TokensClaimed } from "../../generated/templates/PoolInitializer/PoolInitializer";
-import { joinHyphen } from "../helpers/general";
+import { InitializerToken, PoolInitializer, TokenContribution, TokenContributor } from "../generated/schema";
+import { TokensContributed, TokensClaimed } from "../generated/templates/PoolInitializer/PoolInitializer";
+import { joinHyphen } from "utils";
 
 function getContributor(initializerAddress: Address, accountAddress: Address): TokenContributor {
   let contributorID = joinHyphen([initializerAddress.toHexString(), accountAddress.toHexString()]);
