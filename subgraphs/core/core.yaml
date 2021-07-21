@@ -56,7 +56,7 @@ dataSources:
     source:
       address: '0xF00A38376C8668fC1f3Cd3dAeef42E0E44A7Fcdb'
       abi: MarketCapSqrtController
-      startBlock: 11372000
+      startBlock: '11372000'
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
