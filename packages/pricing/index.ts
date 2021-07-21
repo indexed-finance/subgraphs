@@ -5,15 +5,18 @@ import {
   BIG_DECIMAL_ONE,
   BIG_DECIMAL_ZERO,
   UNISWAP_FACTORY_ADDRESS,
-  USDT_WETH_PAIR,
   USDT_ADDRESS,
   WETH_ADDRESS,
   REWARDS_TOKEN_ADDRESS,
-  DAI_ADDRESS,
-  BIG_INT_ZERO
+  BIG_INT_ZERO,
+  SUSHI_TOKEN_ADDRESS,
+  BIG_INT_18,
+  SUSHI_USDT_PAIR_ADDRESS,
+  UNISWAP_SUSHI_ETH_PAIR_FIRST_LIQUDITY_BLOCK,
+  UNISWAP_SUSHI_USDT_PAIR_ADDRESS
 } from 'const'
 import { convertTokenToDecimal } from 'utils'
-import { Address, Bytes, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigDecimal, BigInt, log, ethereum } from '@graphprotocol/graph-ts'
 
 import { Factory as FactoryContract } from 'multitokenstaking/generated/MultiTokenStaking/Factory'
 import { Pair as PairContract } from 'multitokenstaking/generated/MultiTokenStaking/Pair'
@@ -223,4 +226,25 @@ export function getEthRate(token: Address): BigDecimal {
 
 export function getRewardsTokenPrice(): BigDecimal {
   return getUSDRate(REWARDS_TOKEN_ADDRESS, BigInt.fromString('18'))
+}
+
+export function getSushiPrice(block: ethereum.Block): BigDecimal {
+  if (block.number.lt(UNISWAP_SUSHI_ETH_PAIR_FIRST_LIQUDITY_BLOCK)) {
+    // If before uniswap sushi-eth pair creation and liquidity added, return zero
+    return BIG_DECIMAL_ZERO
+  } else if (block.number.lt(BigInt.fromI32(10800029))) {
+    // Else if before uniswap sushi-usdt pair creation (get price from eth sushi-eth pair above)
+    return getUSDRate(SUSHI_TOKEN_ADDRESS, BIG_INT_18)
+  } else {
+    // Else get price from either uni or sushi usdt pair depending on space-time
+    let pair = PairContract.bind(
+      block.number.le(BigInt.fromI32(10829344)) ? UNISWAP_SUSHI_USDT_PAIR_ADDRESS : SUSHI_USDT_PAIR_ADDRESS
+    )
+    let reserves = pair.getReserves()
+    return reserves.value1
+      .toBigDecimal()
+      .times(BIG_DECIMAL_1E18)
+      .div(reserves.value0.toBigDecimal())
+      .div(BIG_DECIMAL_1E6)
+  }
 }
