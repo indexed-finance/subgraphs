@@ -1,13 +1,9 @@
 import { BIG_DECIMAL_ZERO, BIG_INT_ZERO } from 'const'
-import { Bytes, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
-
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, Bytes, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { NULL_CALL_RESULT_VALUE } from 'const'
-
 import { ERC20 } from 'multitokenstaking/generated/MultiTokenStaking/ERC20'
 import { ERC20NameBytes } from 'multitokenstaking/generated/MultiTokenStaking/ERC20NameBytes'
 import { ERC20SymbolBytes } from 'multitokenstaking/generated/MultiTokenStaking/ERC20SymbolBytes'
-
 
 export function hexToDecimal(hexString: string, decimals: number): BigDecimal {
   let bytes = Bytes.fromHexString(hexString).reverse() as Bytes;
@@ -58,6 +54,22 @@ export function pow(base: BigDecimal, exponent: number): BigDecimal {
   return result
 }
 
+export function getDecimals(address: Address): BigInt {
+  let  contract = ERC20.bind(address)
+
+  let decimalValue = null
+
+  let decimalResult = contract.try_decimals()
+
+  if (!decimalResult.reverted) {
+    decimalValue = decimalResult.value
+  } else {
+    decimalValue = 18
+  }
+
+  return BigInt.fromI32(decimalValue as i32)
+}
+
 export function getSymbol(address: Address): string {
   // hard coded override
   if (address.toHex() == '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a') {
@@ -75,9 +87,9 @@ export function getSymbol(address: Address): string {
 
   // try types string and bytes32 for symbol
   let symbolValue = 'unknown'
-  let  symbolResult = contract.try_symbol()
+  let symbolResult = contract.try_symbol()
   if (symbolResult.reverted) {
-    let  symbolResultBytes = contractSymbolBytes.try_symbol()
+    let symbolResultBytes = contractSymbolBytes.try_symbol()
     if (!symbolResultBytes.reverted) {
       // for broken pairs that have no symbol function exposed
       if (symbolResultBytes.value.toHex() != NULL_CALL_RESULT_VALUE) {
