@@ -96,7 +96,6 @@ type Pool @entity {
   token0: Bytes
   token1: Bytes
 
-
   # Owner
   owner: MultiTokenStaking!
 

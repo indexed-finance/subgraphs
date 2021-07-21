@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.1
 description: Staking rewards for multiple tokens
 repository: https://github.com/indexed-finance/subgraphs
 schema:
