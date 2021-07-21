@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 
 /** ========= Numbers & Bytes ========= */
 
-export const BIG_INT_18 = BigInt.fromI32(18)
+export let BIG_INT_18 = BigInt.fromI32(18)
 
 export let ADDRESS_ZERO = Address.fromString('0x0000000000000000000000000000000000000000')
 
@@ -52,7 +52,17 @@ export let UNISWAP_FACTORY_ADDRESS = Address.fromString('0x5C69bEe701ef814a2B6a3
 
 /** ========= Other ========= */
 
+export let ADAPTER_REGISTRY_ADDRESS = Address.fromString('0x1111111111111111111111111111111111111111')
+
 export let MULTI_TOKEN_STAKING_ADDRESS = Address.fromString('0xC46E0E7eCb3EfCC417f6F89b940FFAFf72556382')
+
+export let MASTER_CHEF_ADDRESS = Address.fromString('0xc2edad668740f1aa35e4d8f227fb8e17dca888cd')
+
+export let SUSHI_TOKEN_ADDRESS = Address.fromString('0x6b3595068778dd592e39a122f4f5a5cf09c90fe2')
+
+export let MASTER_CHEF_START_BLOCK = BigInt.fromI32(10750000)
+
+export let UNISWAP_SUSHI_ETH_PAIR_FIRST_LIQUDITY_BLOCK = BigInt.fromI32(10750005)
 
 /** ========= Uniswap Pairs ========= */
 
@@ -61,6 +71,10 @@ export let USDC_WETH_PAIR = Address.fromString('0xB4e16d0168e52d35CaCD2c6185b442
 export let DAI_WETH_PAIR = Address.fromString('0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11')
 
 export let USDT_WETH_PAIR = Address.fromString('0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852')
+
+export let UNISWAP_SUSHI_USDT_PAIR_ADDRESS = Address.fromString('0xe3ffab89e53422f468be955e7011932efe80aa26')
+
+export let SUSHI_USDT_PAIR_ADDRESS = Address.fromString('0x680a025da7b1be2c204d7745e809919bce074026')
 
 /** ========= Governance Status ========= */
 

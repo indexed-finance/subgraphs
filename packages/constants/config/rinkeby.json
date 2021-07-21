@@ -1,4 +1,6 @@
 {
+  "masterchef_address": "0x80c7dd17b01855a6d2347444a0fcc36136a314de",
+  "sushi_token_address": "0x0769fd68dfb93167989c6f7254cd0d766fb2841f",
   "rewards_token_address": "0xE9B837a04Da0f94669EBd99D8CEdc19eaE8F0893",
   "weth_address": "0xc778417e063141139fce010982780140aa0cd5ab",
   "usdt_address": "0xfb1d709cb959ac0ea14cad0927eabc7832e65058",
@@ -8,5 +10,7 @@
   "multi_token_staking_address": "0xd4Ca58850bf7814660fb55234EF1fCBDF5c04D60",
   "usdc_weth_pair": "0x6BccBb84fc4125470C09b75990b5BAe7e5D4E6F5",
   "dai_weth_pair": "0xAeDD67865bF51f3b5692eba3B72C0E29b7615BcD",
+  "sushi_usdt_pair_address": "",
+  "uniswap_sushi_usdt_pair_address": "",
   "usdt_weth_pair": "0xF1Ea55A2bCbc86dC52A277763c44c0A5425c2ed3"
 }
