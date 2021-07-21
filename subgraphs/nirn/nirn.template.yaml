@@ -1,0 +1,141 @@
+specVersion: 0.0.1
+description: Staking rewards for multiple tokens
+repository: https://github.com/indexed-finance/subgraphs
+schema:
+  file: ./nirn.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: AdapterRegistry
+    network: {{ network }}
+    source:
+      address: '{{ address }}'
+      abi: AdapterRegistry
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - TokenAdapter
+        - ProtocolAdapter
+        - UnderlyingToken
+        - WrapperToken
+        - Registry
+      abis:
+        - name: AdapterRegistry
+          file: ../../packages/abis/AdapterRegistry.json
+        - name: ProtocolAdapter
+          file: ../../packages/abis/ProtocolAdapter.json
+        - name: Erc20Adapter
+          file: ../../packages/abis/Erc20Adapter.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ../../packages/abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ../../packages/abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: ProtocolAdapterAdded(uint256,address)
+          handler: protocolAdapterAdded
+        - event: ProtocolAdapterRemoved(uint256)
+          handler: protocolAdapterRemoved
+        - event: TokenAdapterAdded(address,uint256,address,address)
+          handler: tokenAdapterAdded
+        - event: TokenAdapterRemoved(address,uint256,address,address)
+          handler: tokenAdapterRemoved
+        - event: TokenSupportAdded(address)
+          handler: tokenSupportAdded
+        - event: TokenSupportRemoved(address)
+          handler: tokenSupportRemoved
+      file: ./src/registry.ts
+templates:
+  - name: ProtocolAdapter
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ProtocolAdapter
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - TokenAdapter
+        - ProtocolAdapter
+        - UnderlyingToken
+        - WrapperToken
+        - Registry
+      abis:
+        - name: AdapterRegistry
+          file: ../../packages/abis/AdapterRegistry.json
+        - name: ProtocolAdapter
+          file: ../../packages/abis/ProtocolAdapter.json
+        - name: Erc20Adapter
+          file: ../../packages/abis/Erc20Adapter.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ../../packages/abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ../../packages/abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: MarketFrozen(address)
+          handler: tokenFrozen
+        - event: MarketUnfrozen(address)
+          handler: tokenUnfrozen
+        - event: AdapterFrozen(address)
+          handler: adapterFrozen
+        - event: AdapterUnfrozen(address)
+          handler: adapterUnfrozen
+      file: ./src/protocolAdapter.ts
+  - name: NirnVault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: NirnVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - TokenAdapter
+        - ProtocolAdapter
+        - UnderlyingToken
+        - WrapperToken
+        - Registry
+        - Vault
+        - VaultDaySnapshot
+        - VaultRebalance
+        - VaultConstituent
+      abis:
+        - name: NirnVault
+          file: ../../packages/abis/NirnVault.json
+        - name: AdapterRegistry
+          file: ../../packages/abis/AdapterRegistry.json
+        - name: ProtocolAdapter
+          file: ../../packages/abis/ProtocolAdapter.json
+        - name: Erc20Adapter
+          file: ../../packages/abis/Erc20Adapter.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ../../packages/abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ../../packages/abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: AdapterRemoved(address)
+          handler: adapterRemoved
+        - event: AllocationsUpdated(address[],uint256[])
+          handler: allocationsUpdated
+        - event: FeesClaimed(uint256,uint256)
+          handler: feesClaimed
+        - event: Rebalanced()
+          handler: rebalanced
+        - event: SetFeeRecipient(address)
+          handler: setFeeRecipient
+        - event: SetPerformanceFee(uint256)
+          handler: setPerformanceFee
+        - event: SetReserveRatio(uint256)
+          handler: setReserveRatio
+        - event: SetRewardsSeller(address)
+          handler: setRewardsSeller
+      file: ./src/vault.ts

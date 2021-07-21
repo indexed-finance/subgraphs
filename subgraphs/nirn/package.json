@@ -1,0 +1,12 @@
+{
+  "name": "nirn",
+  "license": "MIT",
+  "version": "1.0.0",
+  "author": "Indexed",
+  "scripts": {
+    "codegen": "graph codegen nirn.yaml",
+    "build": "graph build nirn.yaml",
+    "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/staking nirn.yaml",
+    "prepare:mainnet": "mustache config/mainnet.json nirn.template.yaml > nirn.yaml"
+  }
+}

@@ -1,0 +1,111 @@
+# ==================== Registry ==================== #
+
+type Registry @entity {
+  id: ID! # address of registry
+
+  protocolAdaptersCount: BigInt! # number of protocols registered
+  protocolAdapters: [ProtocolAdapter!]! @derivedFrom(field: "registry")
+
+  tokenAdaptersCount: BigInt! # number of token adapters registered
+  tokenAdapters: [ProtocolAdapter!]! @derivedFrom(field: "registry")
+
+  supportedTokensCount: BigInt! # number of tokens listed
+  supportedTokens: [UnderlyingToken!]! @derivedFrom(field: "registry")
+}
+
+# ==================== Adapters ==================== #
+
+type TokenAdapter @entity {
+  id: ID! # adapter address
+  name: String! # name of the adapter in the format "[protocol] [underlying symbol] Adapter", e.g. "Compound DAI Adapter"
+
+  underlying: UnderlyingToken! # underlying token address
+  wrapper: WrapperToken! # wrapper token address
+  protocol: ProtocolAdapter! # protocol that deployed the adapter
+  registry: Registry! # If null address, adapter no longer supported
+}
+
+type ProtocolAdapter @entity {
+  id: ID! # protocol ID in the registry
+  address: Bytes! # protocol adapter address
+  name: String! # name of the protocol
+
+  tokenAdaptersCount: BigInt! # number of token adapters registered
+  tokenAdapters: [TokenAdapter!]! @derivedFrom(field: "protocol")
+  registry: Registry! # If null address, protocol no longer supported
+}
+
+# ==================== Vaults ==================== #
+
+type Vault @entity {
+  id: ID!
+  symbol: String!
+  name: String!
+  decimals: BigInt!
+
+  totalFeesClaimed: BigInt!
+
+  underlying: UnderlyingToken!
+
+  feeRecipient: Bytes!
+  rewardsSeller: Bytes!
+
+  performanceFee: BigDecimal!
+  reserveRatio: BigDecimal!
+
+  adapters: [TokenAdapter!]!
+  weights: [BigDecimal!]!
+  snapshots: [VaultSnapshot!]! @derivedFrom(field: "vault")
+}
+
+enum SnapshotType { Daily, Rebalance }
+
+type VaultSnapshot @entity {
+  id: ID! # vault-timestamp
+  vault: Vault!
+  type: SnapshotType
+  timestamp: BigInt!
+  adapters: [TokenAdapter!]!
+  weights: [BigDecimal!]!
+  aprs: [BigDecimal!]!
+  apr: BigDecimal!
+}
+
+# ==================== Tokens ==================== #
+
+type UnderlyingToken @entity {
+  id: ID! # address of token
+  symbol: String!
+  name: String!
+  decimals: BigInt!
+
+  tokenAdaptersCount: BigInt!
+  tokenAdapters: [TokenAdapter!]! @derivedFrom(field: "underlying")
+  wrappers: [WrapperToken!]! @derivedFrom(field: "underlying")
+  registry: Registry! # If null address, token no longer supported
+}
+
+type WrapperToken @entity {
+  id: ID!
+  symbol: String!
+  name: String!
+  decimals: BigInt!
+
+  underlying: UnderlyingToken!
+  protocol: ProtocolAdapter!
+  adapter: TokenAdapter! @derivedFrom(field: "wrapper")
+}
+
+# ==================== Frozen ==================== #
+
+type FrozenAdapter @entity {
+  id: ID! # protocol-adapter
+  protocol: ProtocolAdapter!
+  adapter: TokenAdapter!
+}
+
+type FrozenToken @entity {
+  id: ID! # protocol-token
+  protocol: ProtocolAdapter!
+  token: UnderlyingToken!
+}
