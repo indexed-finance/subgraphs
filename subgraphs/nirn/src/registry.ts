@@ -1,4 +1,3 @@
-import { Address } from '@graphprotocol/graph-ts'
 import { ADDRESS_ZERO, BIG_INT_ONE } from 'const'
 import {
   ProtocolAdapterAdded,
@@ -6,14 +5,16 @@ import {
   TokenAdapterAdded,
   TokenAdapterRemoved,
   TokenSupportAdded,
-  TokenSupportRemoved
+  TokenSupportRemoved,
+  VaultAdded,
+  VaultRemoved
 } from '../generated/AdapterRegistry/AdapterRegistry'
 import {
   Erc20Adapter as TokenAdapterContract,
 } from '../generated/AdapterRegistry/Erc20Adapter'
 import { AdapterFrozen, AdapterUnfrozen, MarketFrozen, MarketUnfrozen } from '../generated/AdapterRegistry/ProtocolAdapter'
 import { FrozenAdapter, FrozenToken, TokenAdapter } from '../generated/schema'
-import { ProtocolAdapter as ProtocolAdapterTemplate } from '../generated/templates'
+import { NirnVault as NirnVaultTemplate } from '../generated/templates'
 import {
   getOrCreateUnderlyingToken,
   getOrCreateProtocolAdapter,
@@ -24,6 +25,19 @@ import {
   removeTokenAdapter,
   getRegistryContract
 } from './utils'
+import { getOrCreateVault } from './vault'
+
+export function vaultAdded(event: VaultAdded): void {
+  let address = event.params.vault
+  getOrCreateVault(address)
+  NirnVaultTemplate.create(address)
+}
+
+export function vaultRemoved(event: VaultRemoved): void {
+  let vault = getOrCreateVault(event.params.vault)
+  vault.registry = ADDRESS_ZERO.toHexString()
+  vault.save()
+}
 
 export function protocolAdapterAdded(event: ProtocolAdapterAdded): void {
   let id = event.params.protocolId
@@ -36,12 +50,12 @@ export function protocolAdapterRemoved(event: ProtocolAdapterRemoved): void {
 
 export function tokenAdapterAdded(event: TokenAdapterAdded): void {
   let address = event.params.adapter
-  let adapter = TokenAdapter.load(address.toString())
+  let adapter = TokenAdapter.load(address.toHexString())
   let registry = getRegistry()
   let protocolAdapter = getOrCreateProtocolAdapter(event.params.protocolId)
   let underlying = getOrCreateUnderlyingToken(event.params.underlying)
   if (adapter === null) {
-    adapter = new TokenAdapter(address.toString())
+    adapter = new TokenAdapter(address.toHexString())
     let adapterContract = TokenAdapterContract.bind(address)
     let wrapper = getOrCreateWrapperToken(address, underlying, protocolAdapter)
     adapter.name = adapterContract.name()
@@ -57,16 +71,13 @@ export function tokenAdapterAdded(event: TokenAdapterAdded): void {
   underlying.save()
 }
 
-
 export function tokenAdapterRemoved(event: TokenAdapterRemoved): void {
   removeTokenAdapter(event.params.adapter)
 }
 
-
 export function tokenSupportAdded(event: TokenSupportAdded): void {
   getOrCreateUnderlyingToken(event.params.underlying)
 }
-
 
 export function tokenSupportRemoved(event: TokenSupportRemoved): void {
   removeUnderlyingToken(event.params.underlying)
@@ -75,7 +86,7 @@ export function tokenSupportRemoved(event: TokenSupportRemoved): void {
 export function tokenFrozen(event: MarketFrozen): void {
   let registry = getRegistryContract()
   let protocolId = registry.protocolAdapterIds(event.address).toString()
-  let token = event.params.token.toString()
+  let token = event.params.token.toHexString()
   let id = protocolId.toString().concat('-').concat(token)
   let frozenToken = FrozenToken.load(id)
   if (frozenToken === null) {
@@ -89,19 +100,19 @@ export function tokenFrozen(event: MarketFrozen): void {
 export function tokenUnfrozen(event: MarketUnfrozen): void {
   let registry = getRegistryContract()
   let protocolId = registry.protocolAdapterIds(event.address).toString()
-  let token = event.params.token.toString()
+  let token = event.params.token.toHexString()
   let id = protocolId.toString().concat('-').concat(token)
   let frozenToken = FrozenToken.load(id)
   if (frozenToken === null) {
     frozenToken = new FrozenToken(id)
   }
-  frozenToken.token = ADDRESS_ZERO.toString()
-  frozenToken.protocol = ADDRESS_ZERO.toString()
+  frozenToken.token = ADDRESS_ZERO.toHexString()
+  frozenToken.protocol = ADDRESS_ZERO.toHexString()
   frozenToken.save()
 }
 
 export function adapterFrozen(event: AdapterFrozen): void {
-  let adapter = TokenAdapter.load(event.params.adapter.toString()) as TokenAdapter
+  let adapter = TokenAdapter.load(event.params.adapter.toHexString()) as TokenAdapter
   let id = adapter.protocol.concat('-').concat(adapter.id)
   let frozenAdapter = FrozenAdapter.load(id)
   if (frozenAdapter === null) {
@@ -113,13 +124,13 @@ export function adapterFrozen(event: AdapterFrozen): void {
 }
 
 export function adapterUnfrozen(event: AdapterUnfrozen): void {
-  let adapter = TokenAdapter.load(event.params.adapter.toString()) as TokenAdapter
+  let adapter = TokenAdapter.load(event.params.adapter.toHexString()) as TokenAdapter
   let id = adapter.protocol.concat('-').concat(adapter.id)
   let frozenAdapter = FrozenAdapter.load(id)
   if (frozenAdapter === null) {
     frozenAdapter = new FrozenAdapter(id)
   }
-  frozenAdapter.adapter = ADDRESS_ZERO.toString()
-  frozenAdapter.protocol = ADDRESS_ZERO.toString()
+  frozenAdapter.adapter = ADDRESS_ZERO.toHexString()
+  frozenAdapter.protocol = ADDRESS_ZERO.toHexString()
   frozenAdapter.save()
 }

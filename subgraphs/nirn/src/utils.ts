@@ -1,6 +1,5 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
-import { ADAPTER_REGISTRY_ADDRESS, ADDRESS_ZERO, BIG_INT_ONE } from 'const'
-import { BIG_INT_ZERO } from 'const/index.template'
+import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { ADAPTER_REGISTRY_ADDRESS, ADDRESS_ZERO, BIG_INT_ZERO, BIG_INT_ONE } from 'const'
 import { getDecimals, getName, getSymbol } from '../../../packages/utils'
 import {
   AdapterRegistry as RegistryContract,
@@ -20,28 +19,28 @@ import { ProtocolAdapter as ProtocolAdapterTemplate } from '../generated/templat
 
 //#region removers
 export function removeUnderlyingToken(address: Address): void {
-  let token = UnderlyingToken.load(address.toString()) as UnderlyingToken
+  let token = UnderlyingToken.load(address.toHexString()) as UnderlyingToken
   let registry = getRegistry()
-  token.registry = ADDRESS_ZERO.toString()
+  token.unset('registry')
   token.save()
   registry.supportedTokensCount = registry.supportedTokensCount.minus(BIG_INT_ONE)
   registry.save()
 }
 
 export function removeProtocolAdapter(id: BigInt): void {
-  let adapter = ProtocolAdapter.load(id.toString()) as ProtocolAdapter
+  let adapter = ProtocolAdapter.load(id.toHexString()) as ProtocolAdapter
   let registry = getRegistry()
-  adapter.registry = ADDRESS_ZERO.toString()
+  adapter.unset('registry')
   adapter.save()
   registry.protocolAdaptersCount = registry.protocolAdaptersCount.minus(BIG_INT_ONE)
   registry.save()
 }
 
 export function removeTokenAdapter(address: Address): void {
-  let adapter = TokenAdapter.load(address.toString()) as TokenAdapter
+  let adapter = TokenAdapter.load(address.toHexString()) as TokenAdapter
   let underlying = getOrCreateUnderlyingToken(Address.fromString(adapter.underlying))
   let registry = getRegistry()
-  adapter.registry = ADDRESS_ZERO.toString()
+  adapter.unset('registry')
   adapter.save()
   underlying.tokenAdaptersCount = underlying.tokenAdaptersCount.minus(BIG_INT_ONE)
   underlying.save()
@@ -56,15 +55,15 @@ export function getRegistryContract(): RegistryContract {
 }
 
 export function getRegistry(): Registry {
-  let registry = Registry.load(ADAPTER_REGISTRY_ADDRESS.toString())
+  let registry = Registry.load(ADAPTER_REGISTRY_ADDRESS.toHexString())
   if (registry === null) {
-    registry = new Registry(ADAPTER_REGISTRY_ADDRESS.toString())
+    registry = new Registry(ADAPTER_REGISTRY_ADDRESS.toHexString())
     registry.protocolAdaptersCount = BIG_INT_ZERO
     registry.tokenAdaptersCount = BIG_INT_ZERO
     registry.supportedTokensCount = BIG_INT_ZERO
     registry.save()
   }
-  return registry
+  return registry as Registry
 }
 
 export function getProtocolIdForAdapter(adapter: Address): BigInt {
@@ -75,35 +74,43 @@ export function getProtocolIdForAdapter(adapter: Address): BigInt {
 }
 
 export function getOrCreateProtocolAdapter(id: BigInt): ProtocolAdapter {
+  log.info('Getting or creating protocol adapter: {}', [id.toString()])
   let adapter = ProtocolAdapter.load(id.toString())
   let registry = getRegistry()
   if (adapter === null) {
+    log.info('Creating protocol adapter: {}', [id.toString()])
     adapter = new ProtocolAdapter(id.toString())
     let registryContract = getRegistryContract()
     let adapterAddress = registryContract.protocolAdapters(id)
+    log.info('Got protocol adapter address: {}', [adapterAddress.toHexString()])
     ProtocolAdapterTemplate.create(adapterAddress)
     let adapterContract = ProtocolAdapterContract.bind(adapterAddress)
     adapter.address = adapterAddress
-    adapter.name = adapterContract.protocol()
+    if (adapterAddress.equals(Address.fromString('0xd80526efbcc066b771028d96b4eb8354124556e4'))) {
+      adapter.name = "Fulcrum"
+    } else {
+      adapter.name = adapterContract.protocol()
+    }
     adapter.tokenAdaptersCount = BIG_INT_ZERO
     adapter.registry = registry.id
     adapter.save()
     registry.protocolAdaptersCount = registry.protocolAdaptersCount.plus(BIG_INT_ONE)
     registry.save()
-  } else if (Address.fromString(adapter.registry).equals(ADDRESS_ZERO)) {
-    adapter.registry = registry.id
-    adapter.save()
-    registry.protocolAdaptersCount = registry.protocolAdaptersCount.plus(BIG_INT_ONE)
-    registry.save()
   }
-  return adapter
+  // if (Address.fromString(adapter.registry) === ADDRESS_ZERO) {
+  //   adapter.registry = registry.id
+  //   adapter.save()
+  //   registry.protocolAdaptersCount = registry.protocolAdaptersCount.plus(BIG_INT_ONE)
+  //   registry.save()
+  // }
+  return adapter as ProtocolAdapter
 }
 
 export function getOrCreateUnderlyingToken(address: Address): UnderlyingToken {
-  let token = UnderlyingToken.load(address.toString())
+  let token = UnderlyingToken.load(address.toHexString())
   let registry = getRegistry()
   if (token === null) {
-    token = new UnderlyingToken(address.toString())
+    token = new UnderlyingToken(address.toHexString())
     token.decimals = getDecimals(address)
     token.name = getName(address)
     token.symbol = getSymbol(address)
@@ -118,7 +125,7 @@ export function getOrCreateUnderlyingToken(address: Address): UnderlyingToken {
     registry.supportedTokensCount = registry.supportedTokensCount.plus(BIG_INT_ONE)
     registry.save()
   }
-  return token
+  return token as UnderlyingToken
 }
 
 export function getOrCreateWrapperToken(
@@ -126,9 +133,9 @@ export function getOrCreateWrapperToken(
   underlying: UnderlyingToken,
   protocol: ProtocolAdapter
 ): WrapperToken {
-  let wrapper = WrapperToken.load(address.toString())
+  let wrapper = WrapperToken.load(address.toHexString())
   if (wrapper === null) {
-    wrapper = new WrapperToken(address.toString())
+    wrapper = new WrapperToken(address.toHexString())
     wrapper.decimals = getDecimals(address)
     wrapper.name = getName(address)
     wrapper.symbol = getSymbol(address)
@@ -136,6 +143,6 @@ export function getOrCreateWrapperToken(
     wrapper.protocol = protocol.id
     wrapper.save()
   }
-  return wrapper
+  return wrapper as WrapperToken
 }
 //#endregion getters
