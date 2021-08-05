@@ -7,11 +7,40 @@ type Registry @entity {
   protocolAdapters: [ProtocolAdapter!]! @derivedFrom(field: "registry")
 
   tokenAdaptersCount: BigInt! # number of token adapters registered
-  tokenAdapters: [ProtocolAdapter!]! @derivedFrom(field: "registry")
+  tokenAdapters: [TokenAdapter!]! @derivedFrom(field: "registry")
 
   supportedTokensCount: BigInt! # number of tokens listed
   supportedTokens: [UnderlyingToken!]! @derivedFrom(field: "registry")
+
+  vaults: [Vault!]! @derivedFrom(field: "registry")
 }
+
+# ==================== Users ==================== #
+
+type Deposit @entity {
+  id: ID!
+  timestamp: BigInt!
+  account: Bytes!
+  underlyingAmount: BigInt!
+  shares: BigInt!
+}
+
+type Withdrawal @entity {
+  id: ID!
+  timestamp: BigInt!
+  account: Bytes!
+  underlyingAmount: BigInt!
+  shares: BigInt!
+}
+
+type VaultAccount @entity {
+  id: ID! #vault-user
+  vault: Vault
+  account: Bytes!
+  shares: BigInt!
+  averagePricePerShare: BigDecimal!
+}
+
 
 # ==================== Adapters ==================== #
 
@@ -22,7 +51,7 @@ type TokenAdapter @entity {
   underlying: UnderlyingToken! # underlying token address
   wrapper: WrapperToken! # wrapper token address
   protocol: ProtocolAdapter! # protocol that deployed the adapter
-  registry: Registry! # If null address, adapter no longer supported
+  registry: Registry # If null address, adapter no longer supported
 }
 
 type ProtocolAdapter @entity {
@@ -32,7 +61,7 @@ type ProtocolAdapter @entity {
 
   tokenAdaptersCount: BigInt! # number of token adapters registered
   tokenAdapters: [TokenAdapter!]! @derivedFrom(field: "protocol")
-  registry: Registry! # If null address, protocol no longer supported
+  registry: Registry # If null address, protocol no longer supported
 }
 
 # ==================== Vaults ==================== #
@@ -44,18 +73,17 @@ type Vault @entity {
   decimals: BigInt!
 
   totalFeesClaimed: BigInt!
+  price: BigDecimal!
 
   underlying: UnderlyingToken!
-
   feeRecipient: Bytes!
   rewardsSeller: Bytes!
-
   performanceFee: BigDecimal!
   reserveRatio: BigDecimal!
-
   adapters: [TokenAdapter!]!
   weights: [BigDecimal!]!
   snapshots: [VaultSnapshot!]! @derivedFrom(field: "vault")
+  registry: Registry
 }
 
 enum SnapshotType { Daily, Rebalance }
@@ -63,11 +91,18 @@ enum SnapshotType { Daily, Rebalance }
 type VaultSnapshot @entity {
   id: ID! # vault-timestamp
   vault: Vault!
-  type: SnapshotType
   timestamp: BigInt!
+  type: SnapshotType
+
+  totalValue: BigInt!
+  totalFeesClaimed: BigInt!
+  price: BigDecimal!
+
+  revenueTokens: [Bytes!]!
+  revenueAPRs: [BigDecimal!]!
+
   adapters: [TokenAdapter!]!
   weights: [BigDecimal!]!
-  aprs: [BigDecimal!]!
   apr: BigDecimal!
 }
 
@@ -82,7 +117,7 @@ type UnderlyingToken @entity {
   tokenAdaptersCount: BigInt!
   tokenAdapters: [TokenAdapter!]! @derivedFrom(field: "underlying")
   wrappers: [WrapperToken!]! @derivedFrom(field: "underlying")
-  registry: Registry! # If null address, token no longer supported
+  registry: Registry # If null address, token no longer supported
 }
 
 type WrapperToken @entity {

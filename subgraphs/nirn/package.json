@@ -6,7 +6,10 @@
   "scripts": {
     "codegen": "graph codegen nirn.yaml",
     "build": "graph build nirn.yaml",
-    "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/staking nirn.yaml",
+    "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/nirn nirn.yaml",
     "prepare:mainnet": "mustache config/mainnet.json nirn.template.yaml > nirn.yaml"
+  },
+  "devDependencies": {
+      "@graphprotocol/graph-ts": "^0.20.0"
   }
 }

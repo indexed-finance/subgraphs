@@ -8,9 +8,9 @@ dataSources:
     name: AdapterRegistry
     network: mainnet
     source:
-      address: '0x1111111111111111111111111111111111111111'
+      address: '0x5F2945604013Ee9f80aE2eDDb384462B681859C4'
       abi: AdapterRegistry
-      startBlock: 12453240
+      startBlock: 12941221
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -21,7 +21,10 @@ dataSources:
         - UnderlyingToken
         - WrapperToken
         - Registry
+        - Vault
       abis:
+        - name: NirnVault
+          file: ../../packages/abis/NirnVault.json
         - name: AdapterRegistry
           file: ../../packages/abis/AdapterRegistry.json
         - name: ProtocolAdapter
@@ -47,6 +50,10 @@ dataSources:
           handler: tokenSupportAdded
         - event: TokenSupportRemoved(address)
           handler: tokenSupportRemoved
+        - event: VaultAdded(address,address)
+          handler: vaultAdded
+        - event: VaultRemoved(address,address)
+          handler: vaultRemoved
       file: ./src/registry.ts
 templates:
   - name: ProtocolAdapter
@@ -64,7 +71,11 @@ templates:
         - UnderlyingToken
         - WrapperToken
         - Registry
+        - FrozenAdapter
+        - FrozenToken
       abis:
+        - name: NirnVault
+          file: ../../packages/abis/NirnVault.json
         - name: AdapterRegistry
           file: ../../packages/abis/AdapterRegistry.json
         - name: ProtocolAdapter
@@ -103,9 +114,7 @@ templates:
         - WrapperToken
         - Registry
         - Vault
-        - VaultDaySnapshot
-        - VaultRebalance
-        - VaultConstituent
+        - VaultSnapshot
       abis:
         - name: NirnVault
           file: ../../packages/abis/NirnVault.json
@@ -138,4 +147,6 @@ templates:
           handler: setReserveRatio
         - event: SetRewardsSeller(address)
           handler: setRewardsSeller
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./src/vault.ts
