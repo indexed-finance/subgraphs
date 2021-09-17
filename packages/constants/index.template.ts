@@ -60,6 +60,10 @@ export let MASTER_CHEF_ADDRESS = Address.fromString('{{ masterchef_address }}')
 
 export let SUSHI_TOKEN_ADDRESS = Address.fromString('{{ sushi_token_address }}')
 
+export let TIME_LOCK_ADDRESS = Address.fromString('{{ time_lock_address }}')
+
+export let DNDX_ADDRESS = Address.fromString('{{ dndx_address }}')
+
 export let MASTER_CHEF_START_BLOCK = BigInt.fromI32(10750000)
 
 export let UNISWAP_SUSHI_ETH_PAIR_FIRST_LIQUDITY_BLOCK = BigInt.fromI32(10750005)

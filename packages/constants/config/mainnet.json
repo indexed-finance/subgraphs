@@ -1,4 +1,5 @@
 {
+  "adapter_registry_address": "0x5F2945604013Ee9f80aE2eDDb384462B681859C4",
   "masterchef_address": "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd",
   "sushi_token_address": "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
   "rewards_token_address": "0x86772b1409b61c639eaac9ba0acfbb6e238e5f83",
@@ -12,5 +13,7 @@
   "uniswap_sushi_usdt_pair_address": "0xe3ffab89e53422f468be955e7011932efe80aa26",
   "usdc_weth_pair": "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
   "dai_weth_pair": "0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11",
-  "usdt_weth_pair": "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852"
+  "usdt_weth_pair": "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852",
+  "time_lock_address": "0xEE285F0Ef0cb1d103A64A85E5A0EDFEdcB53900f",
+  "dndx_address": "0x262cd9ADCE436B6827C01291B84f1871FB8b95A3"
 }

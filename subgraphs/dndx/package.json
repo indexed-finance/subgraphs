@@ -1,0 +1,16 @@
+{
+  "name": "dndx",
+  "license": "MIT",
+  "version": "1.0.0",
+  "author": "SushiSwap",
+  "scripts": {
+    "codegen": "graph codegen dndx.yaml",
+    "build": "graph build dndx.yaml",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ indexed-finance/indexed-dividends dndx.yaml",
+    "create-local": "graph create --node http://localhost:8020/ /indexed-finance/indexed-dividends",
+    "remove-local": "graph remove --node http://localhost:8020/ /indexed-finance/indexed-dividends",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 /indexed-finance/indexed-dividends",
+    "prepare:mainnet": "mustache config/mainnet.json dndx.template.yaml > dndx.yaml",
+    "prepare:rinkeby": "mustache config/rinkeby.json dndx.template.yaml > dndx.yaml"
+  }
+}

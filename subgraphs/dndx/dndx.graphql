@@ -1,0 +1,43 @@
+type DNDX @entity {
+  id: ID!
+  # config
+  depositToken: Bytes!
+  dividendsToken: Bytes!
+  minLockDuration: BigInt!
+  maxLockDuration: BigInt!
+  minEarlyWithdrawalFee: BigInt!
+  baseEarlyWithdrawalFee: BigInt!
+  maxDividendsBonusMultiplier: BigInt!
+  minimumDeposit: BigInt!
+  feeRecipient: Bytes!
+  unlocked: Boolean!
+  # stats
+  totalDeposits: BigInt!
+  totalDividendShares: BigInt!
+  totalEthDistributed: BigInt!
+  totalEthWithdrawn: BigInt!
+  totalEarlyWithdrawalFees: BigInt!
+  numDisbursals: BigInt!
+  disbursals: [Disbursal!]! @derivedFrom(field: "dndx")
+  numLocks: BigInt!
+  locks: [TimeLock!]! @derivedFrom(field: "dndx")
+}
+
+type Disbursal @entity {
+  id: ID!
+  dndx: DNDX!
+  sender: Bytes!
+  disbursedAt: BigInt!
+  ethDistributed: BigInt!
+  totalDividendShares: BigInt!
+}
+
+type TimeLock @entity {
+  id: ID!
+  dndx: DNDX!
+  owner: Bytes!
+  createdAt: BigInt!
+  ndxAmount: BigInt!
+  duration: BigInt!
+  dndxShares: BigInt!
+}

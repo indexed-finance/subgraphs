@@ -52,13 +52,17 @@ export let UNISWAP_FACTORY_ADDRESS = Address.fromString('0x5C69bEe701ef814a2B6a3
 
 /** ========= Other ========= */
 
-export let ADAPTER_REGISTRY_ADDRESS = Address.fromString('0x1111111111111111111111111111111111111111')
+export let ADAPTER_REGISTRY_ADDRESS = Address.fromString('0x5F2945604013Ee9f80aE2eDDb384462B681859C4')
 
 export let MULTI_TOKEN_STAKING_ADDRESS = Address.fromString('0xC46E0E7eCb3EfCC417f6F89b940FFAFf72556382')
 
 export let MASTER_CHEF_ADDRESS = Address.fromString('0xc2edad668740f1aa35e4d8f227fb8e17dca888cd')
 
 export let SUSHI_TOKEN_ADDRESS = Address.fromString('0x6b3595068778dd592e39a122f4f5a5cf09c90fe2')
+
+export let TIME_LOCK_ADDRESS = Address.fromString('0xEE285F0Ef0cb1d103A64A85E5A0EDFEdcB53900f')
+
+export let DNDX_ADDRESS = Address.fromString('0x262cd9ADCE436B6827C01291B84f1871FB8b95A3')
 
 export let MASTER_CHEF_START_BLOCK = BigInt.fromI32(10750000)
 

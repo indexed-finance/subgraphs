@@ -1,0 +1,72 @@
+specVersion: 0.0.3
+description: dndx
+repository: https://github.com/indexed-finance/subgraphs
+schema:
+  file: ./dndx.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: SharesTimeLock
+    network: {{ network }}
+    source:
+      address: '{{ timeLockAddress }}'
+      abi: SharesTimeLock
+      startBlock: {{ timeLockStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DNDX
+        - Disbursal
+        - TimeLock
+      abis:
+        - name: SharesTimeLock
+          file: ../../packages/abis/SharesTimeLock.json
+        - name: ERC20DividendsOwned
+          file: ../../packages/abis/ERC20DividendsOwned.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+      eventHandlers:
+        - event: LockCreated(indexed uint256,indexed address,uint256,uint256,uint32)
+          handler: lockCreated
+        - event: LockDestroyed(indexed uint256,indexed address,uint256,uint256)
+          handler: lockDestroyed
+        - event: PartialWithdrawal(indexed uint256,indexed address,uint256,uint256)
+          handler: partialWithdrawal
+        - event: MinimumDepositSet(uint256)
+          handler: minimumDepositSet
+        - event: FeeRecipientSet(address)
+          handler: feeRecipientSet
+        - event: FeesReceived(uint256)
+          handler: feesReceived
+        - event: EmergencyUnlockTriggered()
+          handler: emergencyUnlockTriggered
+      file: ./src/timeLock.ts
+  - kind: ethereum/contract
+    name: ERC20DividendsOwned
+    network: mainnet
+    source:
+      address: '{{ dndxAddress }}'
+      abi: ERC20DividendsOwned
+      startBlock: {{ dndxStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DNDX
+        - Disbursal
+        - TimeLock
+      abis:
+        - name: SharesTimeLock
+          file: ../../packages/abis/SharesTimeLock.json
+        - name: ERC20DividendsOwned
+          file: ../../packages/abis/ERC20DividendsOwned.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+      eventHandlers:
+        - event: DividendsDistributed(indexed address,uint256)
+          handler: dividendsDistributed
+        - event: DividendsWithdrawn(indexed address,uint256)
+          handler: dividendsWithdrawn
+      file: ./src/dndx.ts

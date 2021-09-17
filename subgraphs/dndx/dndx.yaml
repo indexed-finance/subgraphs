@@ -1,0 +1,64 @@
+specVersion: 0.0.3
+description: dndx
+repository: https://github.com/indexed-finance/subgraphs
+schema:
+  file: ./dndx.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: SharesTimeLock
+    network: mainnet
+    source:
+      address: '0xEE285F0Ef0cb1d103A64A85E5A0EDFEdcB53900f'
+      abi: SharesTimeLock
+      startBlock: 13245340
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DNDX
+        - Disbursal
+        - TimeLock
+      abis:
+        - name: SharesTimeLock
+          file: ../../packages/abis/SharesTimeLock.json
+        - name: ERC20DividendsOwned
+          file: ../../packages/abis/ERC20DividendsOwned.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+      eventHandlers:
+        - event: LockCreated(indexed uint256,indexed address,uint256,uint256,uint32)
+          handler: lockCreated
+        - event: LockDestroyed(indexed uint256,indexed address,uint256,uint256)
+          handler: lockDestroyed
+        - event: PartialWithdrawal(indexed uint256,indexed address,uint256,uint256)
+          handler: partialWithdrawal
+      file: ./src/timeLock.ts
+  - kind: ethereum/contract
+    name: ERC20DividendsOwned
+    network: mainnet
+    source:
+      address: '0x262cd9ADCE436B6827C01291B84f1871FB8b95A3'
+      abi: ERC20DividendsOwned
+      startBlock: 13245217
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DNDX
+        - Disbursal
+        - TimeLock
+      abis:
+        - name: SharesTimeLock
+          file: ../../packages/abis/SharesTimeLock.json
+        - name: ERC20DividendsOwned
+          file: ../../packages/abis/ERC20DividendsOwned.json
+        - name: ERC20
+          file: ../../packages/abis/ERC20.json
+      eventHandlers:
+        - event: DividendsDistributed(indexed address,uint256)
+          handler: dividendsDistributed
+        - event: DividendsWithdrawn(indexed address,uint256)
+          handler: dividendsWithdrawn
+      file: ./src/dndx.ts

@@ -1,0 +1,7 @@
+{
+  "network": "mainnet",
+  "timeLockAddress": "0xEE285F0Ef0cb1d103A64A85E5A0EDFEdcB53900f",
+  "timeLockStartBlock": 13245340,
+  "dndxAddress": "0x262cd9ADCE436B6827C01291B84f1871FB8b95A3",
+  "dndxStartBlock": 13245217
+}
